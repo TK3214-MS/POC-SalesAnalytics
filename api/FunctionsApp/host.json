@@ -1,0 +1,42 @@
+{
+  "version": "2.0",
+  "logging": {
+    "applicationInsights": {
+      "samplingSettings": {
+        "isEnabled": true,
+        "maxTelemetryItemsPerSecond": 20
+      }
+    },
+    "logLevel": {
+      "default": "Information",
+      "Host.Results": "Error",
+      "Function": "Information",
+      "Host.Aggregator": "Trace"
+    }
+  },
+  "extensions": {
+    "durableTask": {
+      "hubName": "SalesAnalytics",
+      "storageProvider": {
+        "connectionStringName": "AzureWebJobsStorage"
+      },
+      "tracing": {
+        "traceInputsAndOutputs": false
+      }
+    }
+  },
+  "functionTimeout": "00:10:00",
+  "healthMonitor": {
+    "enabled": true,
+    "healthCheckInterval": "00:00:10",
+    "healthCheckWindow": "00:02:00",
+    "healthCheckThreshold": 6,
+    "counterThreshold": 0.80
+  },
+  "retry": {
+    "strategy": "exponentialBackoff",
+    "maxRetryCount": 3,
+    "minimumInterval": "00:00:05",
+    "maximumInterval": "00:01:00"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    
+    "CosmosDbConnectionString": "AccountEndpoint=https://localhost:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==",
+    "CosmosDbDatabaseName": "SalesAnalytics",
+    "CosmosDbSessionsContainerName": "sessions",
+    "CosmosDbAuditContainerName": "label_audit",
+    
+    "BlobStorageConnectionString": "UseDevelopmentStorage=true",
+    "BlobContainerName": "audio-uploads",
+    
+    "SpeechServiceEndpoint": "https://YOUR-REGION.api.cognitive.microsoft.com/",
+    "SpeechServiceKey": "YOUR_SPEECH_KEY",
+    
+    "LanguageServiceEndpoint": "https://YOUR-REGION.api.cognitive.microsoft.com/",
+    "LanguageServiceKey": "YOUR_LANGUAGE_KEY",
+    
+    "OpenAIEndpoint": "https://YOUR-OPENAI.openai.azure.com/",
+    "OpenAIKey": "YOUR_OPENAI_KEY",
+    "OpenAIDeploymentName": "gpt-4o",
+    
+    "SearchServiceEndpoint": "https://YOUR-SEARCH.search.windows.net",
+    "SearchServiceKey": "YOUR_SEARCH_ADMIN_KEY",
+    "SearchIndexName": "sessions-index",
+    
+    "KeyVaultUri": ""
+  }
+}
