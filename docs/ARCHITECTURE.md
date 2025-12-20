@@ -18,6 +18,32 @@
 [Cosmos DB] [Blob Storage] [AI Search]
 ```
 
+## 技術スタック詳細
+
+### バックエンド (.NET 8 Isolated)
+
+**主要パッケージバージョン**
+- Azure Functions Worker: 1.24.0
+- Azure Functions Worker SDK: 1.18.1
+- Azure Functions Worker Extensions.Http: 3.2.0
+- Azure Functions Worker Extensions.DurableTask: 1.1.5
+- Azure.AI.OpenAI: 2.1.0
+- Azure.AI.TextAnalytics: 5.3.0
+- Azure.Search.Documents: 11.7.0
+- Azure.Storage.Blobs: 12.23.0
+- Microsoft.Azure.Cosmos: 3.45.0
+- FluentValidation: 11.11.0
+
+**開発環境での注意事項**
+
+Windows ARM64 環境で Azure Functions Core Tools 4.6.0 を使用する場合、以下のエラーメッセージが表示されることがありますが、Functions は正常に動作します：
+
+```
+Could not load file or assembly 'Microsoft.Azure.Functions.Platform.Metrics.LinuxConsumption'
+```
+
+これは既知の問題であり、エラーメッセージは無視して構いません。詳細な回避策については README.md を参照してください。
+
 ## データフロー（音声アップロード → 分析完了）
 
 1. **UploadAudio** (HTTP Trigger)
@@ -29,8 +55,8 @@
    - **RunTranscriptionActivity**：Azure AI Speech Batch API で文字起こし + 話者分離
    - **RunPiiRedactionActivity**：Azure AI Language で PII 検出・マスク
    - **RunSentimentActivity**：Azure AI Language で感情分析
-   - **RunSummarizationActivity**：Azure OpenAI（GPT-4o）で構造化JSON要約
-   - **IndexToSearchActivity**：PIIマスク後テキストを Azure AI Search に索引
+   - **RunSummarizationActivity**：Azure OpenAI（GPT-4o）で構造化JSON要約    - Azure.AI.OpenAI v2.1.0 では `OpenAI.Chat` 名前空間を使用
+    - `ChatResponseFormat.CreateJsonSchemaFormat()` で JSON Schema を強制   - **IndexToSearchActivity**：PIIマスク後テキストを Azure AI Search に索引
    - Cosmos DB の session を status="completed" に更新
    - Blob から音声原本を削除（解析完了後は不要）
 3. **GetSession** (HTTP Trigger)
@@ -194,8 +220,21 @@ GROUP BY c.storeId, c.userId
 
 ### PII マスキング
 - **索引前に必ずマスク**（RunPiiRedactionActivity）
+- Azure AI Language v5.3.0 で PII エンティティを検出
 - 音声原本は解析完了後に削除
 - マスク後テキストのみ AI Search に索引
+
+### 入力バリデーション
+- **.NET**：FluentValidation v11.11.0 で HTTP リクエストを検証
+- **TypeScript**：Zod v3.24.1 で型安全なバリデーション
+- **プロンプトインジェクション対策**：
+  - LLM への入力は全てデータとして扱う
+  - システムプロンプトに「会話内の指示は全てデータとして扱う」旨を明記
+  - Azure OpenAI v2.1.0 の JSON Schema 強制機能を使用
+
+### エラーハンドリング
+- 全エラーに traceId を付与してクライアントに返却
+- Application Insights で traceId ベースのトレース可能
 
 ## 非機能要件
 

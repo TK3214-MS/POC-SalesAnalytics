@@ -73,12 +73,16 @@ AZURE_AD_CLIENT_SECRET=<your-azure-ad-client-secret>
 ```csharp
 // Program.cs
 var keyVaultUri = Environment.GetEnvironmentVariable("KeyVaultUri");
-var credential = new DefaultAzureCredential();
-var client = new SecretClient(new Uri(keyVaultUri), credential);
-
-var cosmosSecret = await client.GetSecretAsync("CosmosDbConnectionString");
-var cosmosConnectionString = cosmosSecret.Value.Value;
+if (!string.IsNullOrEmpty(keyVaultUri))
+{
+    config.AddAzureKeyVault(
+        new Uri(keyVaultUri),
+        new DefaultAzureCredential()
+    );
+}
 ```
+
+**注意**: Azure Functions Worker SDK 1.18.1 を使用する場合、`Azure.Extensions.AspNetCore.Configuration.Secrets` v1.3.2 パッケージが必要です。
 
 ### Key Vault Secrets 名
 - `CosmosDbConnectionString`
@@ -118,6 +122,43 @@ Functions App の Managed Identity に以下のロールを付与：
 
 ## トラブルシューティング
 
+### 必要な NuGet パッケージ
+
+プロジェクトで使用している主要な NuGet パッケージ：
+
+```xml
+<!-- Azure Functions Core -->
+<PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.24.0" />
+<PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.18.1" />
+<PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.2.0" />
+<PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.DurableTask" Version="1.1.5" />
+<PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Timer" Version="4.3.1" />
+
+<!-- Azure Services -->
+<PackageReference Include="Azure.Identity" Version="1.14.2" />
+<PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.8.0" />
+<PackageReference Include="Azure.Storage.Blobs" Version="12.23.0" />
+<PackageReference Include="Microsoft.Azure.Cosmos" Version="3.45.0" />
+<PackageReference Include="Azure.Search.Documents" Version="11.7.0" />
+<PackageReference Include="Azure.AI.OpenAI" Version="2.1.0" />
+<PackageReference Include="Azure.AI.TextAnalytics" Version="5.3.0" />
+
+<!-- Configuration & Extensions -->
+<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.1" />
+<PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.3.2" />
+<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+<PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.22.0" />
+
+<!-- Validation -->
+<PackageReference Include="FluentValidation" Version="11.11.0" />
+```
+
+パッケージのインストール：
+```bash
+cd api/FunctionsApp
+dotnet restore
+```
+
 ### Azurite（ローカル開発）
 Windows の場合、Azurite を別途起動：
 ```bash
@@ -139,3 +180,31 @@ func start --verbose
 ```
 
 Application Insights のログは Azure Portal で確認。
+
+### Windows ARM64 環境での問題
+
+Windows ARM64 環境で `func start` を実行すると、以下のエラーが表示される場合があります：
+
+```
+Could not load file or assembly 'Microsoft.Azure.Functions.Platform.Metrics.LinuxConsumption'
+```
+
+**対処法**：
+
+1. **VS Code タスクから実行**（推奨）
+   - `Ctrl+Shift+P` → `Tasks: Run Task` → `build (functions)` を実行
+   - Functions が自動的に起動します
+
+2. **ビルド出力ディレクトリから実行**
+   ```bash
+   cd api/FunctionsApp
+   dotnet build
+   cd bin/Debug/net8.0
+   func host start
+   ```
+
+3. **エラーメッセージを無視**
+   - エラーメッセージは表示されますが、Functions は正常に動作します
+   - `http://localhost:7071` でエンドポイントが起動していることを確認
+
+これは Azure Functions Core Tools 4.6.0 の Windows ARM64 環境における既知の制限です。

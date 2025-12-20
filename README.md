@@ -19,28 +19,39 @@
 - Next.js 16.0.10（App Router）
 - React 19.2.3
 - TypeScript 5.9.3
-- Tailwind CSS v4
-- Base UI (@base-ui/react)
+- Tailwind CSS v4.1.10
+- Base UI (@base-ui/react) 1.0.0
 - pnpm 10.26.0
+- Zod 3.24.1（バリデーション）
+- date-fns 4.1.0（日付処理）
+- recharts 2.15.0（グラフ表示）
 
 **Backend**
 - Azure Functions v4 (.NET 8 Isolated)
-- Durable Functions
-- Azure AI Speech（文字起こし + 話者分離）
-- Azure AI Language（PII検出、感情分析）
-- Azure OpenAI（GPT-4o要約）
-- Azure AI Search（ベクトル検索）
-- Azure Cosmos DB（NoSQL）
-- Azure Blob Storage（音声ファイル一時保存）
-- Azure Key Vault（Secrets管理）
+  - Azure Functions Worker: 1.24.0
+  - Worker SDK: 1.18.1
+  - Durable Task Extensions: 1.1.5
+- Azure AI Services
+  - Azure AI Speech（文字起こし + 話者分離）
+  - Azure AI Language（PII検出、感情分析）v5.3.0
+  - Azure OpenAI（GPT-4o要約）v2.1.0
+- Azure Data & Storage
+  - Azure AI Search（ベクトル検索）v11.7.0
+  - Azure Cosmos DB（NoSQL）v3.45.0
+  - Azure Blob Storage（音声ファイル一時保存）v12.23.0
+  - Azure Key Vault（Secrets管理）v4.8.0
+- バリデーション & ユーティリティ
+  - FluentValidation v11.11.0
 
 ## セットアップ
 
 ### 前提条件
 - Node.js 20.x以上
-- .NET 8 SDK
+- .NET 8 SDK（8.0.404以上推奨）
+- Azure Functions Core Tools 4.6.0以上
 - Azure CLI
 - corepack有効化（`corepack enable`）
+- Azurite（ローカル開発時のストレージエミュレータ）
 
 ### 1. リポジトリクローン
 ```bash
@@ -71,6 +82,34 @@ func start
 ```
 
 Functions は `http://localhost:7071` で起動。
+
+**注意事項 (Windows ARM64 環境)**
+
+Windows ARM64 環境では、Azure Functions Core Tools 4.6.0 の既知の問題により、以下のエラーメッセージが表示される場合があります：
+
+```
+Could not load file or assembly 'Microsoft.Azure.Functions.Platform.Metrics.LinuxConsumption'
+```
+
+このエラーメッセージは表示されますが、Functionsは正常に動作します。以下のいずれかの方法で対処できます：
+
+1. **VS Code タスクから実行**（推奨）
+   - VS Codeで `Ctrl+Shift+P` → `Tasks: Run Task` → `build (functions)` を実行
+   - その後、自動的に Functions が起動します
+
+2. **ビルド出力ディレクトリから直接実行**
+   ```bash
+   cd api/FunctionsApp
+   dotnet build
+   cd bin/Debug/net8.0
+   func host start
+   ```
+
+3. **Docker コンテナで実行**
+   ```bash
+   docker build -t salesanalytics-api .
+   docker run -p 7071:80 salesanalytics-api
+   ```
 
 ### 4. Azure リソース展開（開発環境）
 ```bash
@@ -153,6 +192,20 @@ Azure AI Search でベクトル索引・検索（最小実装）。
 - 保持延長UI（最大1年）
 - Blob Lifecycle ポリシー高度設定
 
+## 既知の問題・制限事項
+
+### Windows ARM64 環境
+- Azure Functions Core Tools 4.6.0 では、以下のエラーメッセージが表示されることがありますが、動作に影響はありません：
+  ```
+  Could not load file or assembly 'Microsoft.Azure.Functions.Platform.Metrics.LinuxConsumption'
+  ```
+- 推奨: VS Code タスクまたはビルド出力ディレクトリから直接実行
+
+### パッケージバージョンの互換性
+- Azure Functions Worker SDK v2.0.0 は Core Tools 4.6.0 と互換性の問題があるため、v1.18.1 を使用
+- Azure.AI.OpenAI v2.1.0 では API の変更があり、`OpenAI.Chat` 名前空間を使用する必要があります
+- Azure.Search.Documents v11.8.0 は現時点で利用できないため、v11.7.0 を使用
+
 ## セキュリティ・コンプライアンス
 
 - **Secrets管理**：Key Vault + Managed Identity（コードにSecrets記載禁止）
@@ -162,10 +215,17 @@ Azure AI Search でベクトル索引・検索（最小実装）。
   - Auditor：全session閲覧のみ（書き込み不可）
 - **監査ログ**：追記専用（更新/削除禁止）
 - **入力バリデーション**：
-  - .NET：FluentValidation
-  - TypeScript：Zod
+  - .NET：FluentValidation v11.11.0
+  - TypeScript：Zod v3.24.1
 - **エラー**：traceId付きで返却
 - **LLM**：JSON Schema強制 + プロンプトインジェクション対策
+- **PII保護**：Azure AI Language v5.3.0 で検出・マスキング後に索引
+
+## 開発環境のセットアップ
+
+詳細は以下のドキュメントを参照：
+- [ARCHITECTURE.md](docs/ARCHITECTURE.md) - システムアーキテクチャの詳細
+- [ENV.md](docs/ENV.md) - 環境変数とトラブルシューティング
 
 ## ライセンス
 

@@ -44,8 +44,8 @@ export default function ApprovalsPage() {
   }
 
   return (
-    <main className="container mx-auto px-4 py-16">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="min-h-screen p-8">
+      <div className="max-w-7xl mx-auto space-y-8">
         <header>
           <h1 className="text-4xl font-bold">承認キュー</h1>
           <p className="text-gray-300 mt-2">
@@ -63,6 +63,6 @@ export default function ApprovalsPage() {
           <ApprovalQueue requests={requests} onUpdate={() => window.location.reload()} />
         )}
       </div>
-    </main>
+    </div>
   );
 }

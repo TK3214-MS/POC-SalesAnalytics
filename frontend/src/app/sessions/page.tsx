@@ -36,15 +36,15 @@ export default function SessionsPage() {
 
   if (loading) {
     return (
-      <main className="container mx-auto px-4 py-16">
+      <div className="min-h-screen p-8">
         <div className="text-center">読み込み中...</div>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="container mx-auto px-4 py-16">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="min-h-screen p-8">
+      <div className="max-w-7xl mx-auto space-y-8">
         <header className="flex items-center justify-between">
           <div>
             <h1 className="text-4xl font-bold">商談一覧</h1>
@@ -94,6 +94,6 @@ export default function SessionsPage() {
           )}
         </div>
       </div>
-    </main>
+    </div>
   );
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import '@/styles/globals.css';
+import { Sidebar } from '@/components/Sidebar';
 
 export const metadata: Metadata = {
   title: 'Sales Analytics - 商談音声分析',
@@ -15,7 +16,10 @@ export default function RootLayout({
     <html lang="ja" suppressHydrationWarning>
       <body className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white">
         <div className="min-h-screen backdrop-blur-xs">
-          {children}
+          <Sidebar />
+          <main className="ml-64">
+            {children}
+          </main>
         </div>
       </body>
     </html>

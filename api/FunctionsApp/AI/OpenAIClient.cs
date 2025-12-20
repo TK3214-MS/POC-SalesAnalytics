@@ -1,6 +1,7 @@
 using Azure;
 using Azure.AI.OpenAI;
 using Microsoft.Extensions.Configuration;
+using OpenAI.Chat;
 using System.ClientModel;
 using System.Text.Json;
 
@@ -47,17 +48,17 @@ public class OpenAIClient
 
         var chatClient = _client.GetChatClient(_deploymentName);
 
-        var messages = new List<Azure.AI.OpenAI.Chat.ChatMessage>
+        var messages = new List<ChatMessage>
         {
-            new Azure.AI.OpenAI.Chat.SystemChatMessage(systemPrompt),
-            new Azure.AI.OpenAI.Chat.UserChatMessage(userPrompt)
+            new SystemChatMessage(systemPrompt),
+            new UserChatMessage(userPrompt)
         };
 
-        var options = new Azure.AI.OpenAI.Chat.ChatCompletionOptions
+        var options = new ChatCompletionOptions
         {
-            ResponseFormat = Azure.AI.OpenAI.Chat.ChatResponseFormat.CreateJsonSchemaFormat(
-                name: "summary",
-                jsonSchema: BinaryData.FromString(@"{
+            ResponseFormat = ChatResponseFormat.CreateJsonSchemaFormat(
+                "summary",
+                BinaryData.FromString(@"{
                     ""type"": ""object"",
                     ""properties"": {
                         ""keyPoints"": { ""type"": ""array"", ""items"": { ""type"": ""string"" } },
@@ -79,8 +80,7 @@ public class OpenAIClient
                         }
                     },
                     ""required"": [""keyPoints"", ""concerns"", ""nextActions"", ""successFactors"", ""improvementAreas"", ""quotations""]
-                }"),
-                strictSchemaEnabled: true
+                }")
             )
         };
 

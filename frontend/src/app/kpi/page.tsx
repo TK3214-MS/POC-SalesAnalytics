@@ -42,7 +42,7 @@ export default function KpiPage() {
   }
 
   return (
-    <main className="container mx-auto px-4 py-16">
+    <div className="min-h-screen p-8">
       <div className="max-w-6xl mx-auto space-y-8">
         <header>
           <h1 className="text-4xl font-bold">KPI ダッシュボード</h1>
@@ -103,6 +103,6 @@ export default function KpiPage() {
           ))}
         </div>
       </div>
-    </main>
+    </div>
   );
 }

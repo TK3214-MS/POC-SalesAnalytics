@@ -15,7 +15,7 @@ export default function UploadPage() {
   };
 
   return (
-    <main className="container mx-auto px-4 py-16">
+    <div className="min-h-screen p-8">
       <div className="max-w-3xl mx-auto space-y-8">
         <header className="text-center space-y-2">
           <h1 className="text-4xl font-bold">音声アップロード</h1>
@@ -45,6 +45,6 @@ export default function UploadPage() {
           />
         )}
       </div>
-    </main>
+    </div>
   );
 }

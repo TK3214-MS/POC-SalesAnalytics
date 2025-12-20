@@ -9,6 +9,10 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Base colors
+        background: '#0f172a',
+        foreground: '#f8fafc',
+        border: 'rgba(255, 255, 255, 0.1)',
         // Liquid Glass palette
         glass: {
           50: 'rgba(255, 255, 255, 0.05)',

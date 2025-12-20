@@ -7,7 +7,7 @@ using FunctionsApp.Data;
 using FunctionsApp.AI;
 
 var host = new HostBuilder()
-    .ConfigureFunctionsWebApplication()
+    .ConfigureFunctionsWorkerDefaults()
     .ConfigureAppConfiguration((context, config) =>
     {
         // Key Vault 統合（本番環境）
@@ -23,7 +23,6 @@ var host = new HostBuilder()
     .ConfigureServices((context, services) =>
     {
         services.AddApplicationInsightsTelemetryWorkerService();
-        services.ConfigureFunctionsApplicationInsights();
 
         // Repositories
         services.AddSingleton<CosmosRepository>();
