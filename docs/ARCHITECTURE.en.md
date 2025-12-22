@@ -1,5 +1,7 @@
 # Architecture Overview
 
+![Architecture](../assets/Architecture.PNG)
+
 > **Language**: [English](ARCHITECTURE.en.md) | [日本語](ARCHITECTURE.md)
 
 ## System Architecture Diagram

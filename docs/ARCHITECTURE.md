@@ -1,5 +1,7 @@
 # アーキテクチャ概要
 
+![Architecture](../assets/Architecture.PNG)
+
 > **Language**: [English](ARCHITECTURE.en.md) | [日本語](ARCHITECTURE.md)
 
 ## システム構成図

@@ -1,5 +1,7 @@
 # Sales Analytics - MVP
 
+![SV-EN](assets/SV-EN.PNG)
+
 > **Language**: [English](README.en.md) | [日本語](README.md)
 
 Auto-Transcription and Analysis System for Automobile Dealer Sales Conversations (MVP)
