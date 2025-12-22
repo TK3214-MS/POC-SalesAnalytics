@@ -1,11 +1,11 @@
-# 環境変数設定ガイド
+# Environment Variables Setup Guide
 
 > **Language**: [English](ENV.en.md) | [日本語](ENV.md)
 
-## フロントエンド (`frontend/.env.local`)
+## Frontend (`frontend/.env.local`)
 
 ```bash
-# Next.js Public Variables (クライアントサイドで参照可能)
+# Next.js Public Variables (accessible on client-side)
 NEXT_PUBLIC_API_BASE_URL=http://localhost:7071/api
 
 # Server-side Only
@@ -14,13 +14,13 @@ AZURE_AD_TENANT_ID=<your-azure-ad-tenant-id>
 AZURE_AD_CLIENT_SECRET=<your-azure-ad-client-secret>
 ```
 
-### 説明
-- `NEXT_PUBLIC_API_BASE_URL`：バックエンド Azure Functions のベース URL
-- `AZURE_AD_CLIENT_ID`：Azure AD B2C / Entra ID のクライアントID（認証用）
-- `AZURE_AD_TENANT_ID`：テナントID
-- `AZURE_AD_CLIENT_SECRET`：クライアントシークレット（サーバーサイドのみ）
+### Description
+- `NEXT_PUBLIC_API_BASE_URL`: Backend Azure Functions base URL
+- `AZURE_AD_CLIENT_ID`: Azure AD B2C / Entra ID client ID (for authentication)
+- `AZURE_AD_TENANT_ID`: Tenant ID
+- `AZURE_AD_CLIENT_SECRET`: Client secret (server-side only)
 
-## バックエンド (`api/FunctionsApp/local.settings.json`)
+## Backend (`api/FunctionsApp/local.settings.json`)
 
 ```json
 {
@@ -62,27 +62,27 @@ AZURE_AD_CLIENT_SECRET=<your-azure-ad-client-secret>
 }
 ```
 
-### 説明
-- `AzureWebJobsStorage`：Functions のストレージ（ローカル開発時は Azurite 使用可）
-- `FUNCTIONS_WORKER_RUNTIME`：.NET Isolated を使用
-- **Cosmos DB**：接続文字列、データベース名、コンテナ名
-- **Blob Storage**：音声ファイル一時保存用
-- **Speech Service**：文字起こし + 話者分離
-- **Language Service**：PII検出、感情分析
-- **OpenAI**：GPT-4o で要約
-- **AI Search**：ベクトル検索用
-- **SharePoint**：営業ロールプレイ用トランスクリプトの保存
-  - `TenantId`：Microsoft Entra ID のテナントID
-  - `ClientId`：SharePoint アクセス用アプリのクライアントID
-  - `ClientSecret`：アプリのクライアントシークレット
-  - `SiteUrl`：SharePoint サイトの完全なURL
-  - `LibraryName`：ドキュメントライブラリ名（例: `RolePlayTranscripts`）
-- **Key Vault**：本番環境では Managed Identity で Secrets 取得
+### Description
+- `AzureWebJobsStorage`: Functions storage (Azurite available for local dev)
+- `FUNCTIONS_WORKER_RUNTIME`: Use .NET Isolated
+- **Cosmos DB**: Connection string, database name, container names
+- **Blob Storage**: Temporary audio file storage
+- **Speech Service**: Transcription + speaker diarization
+- **Language Service**: PII detection, sentiment analysis
+- **OpenAI**: GPT-4o summarization
+- **AI Search**: Vector search
+- **SharePoint**: Sales role-play transcript storage
+  - `TenantId`: Microsoft Entra ID tenant ID
+  - `ClientId`: SharePoint access app client ID
+  - `ClientSecret`: App client secret
+  - `SiteUrl`: SharePoint site full URL
+  - `LibraryName`: Document library name (e.g., `RolePlayTranscripts`)
+- **Key Vault**: Retrieve secrets via Managed Identity in production
 
-## 本番環境（Azure）
+## Production Environment (Azure)
 
-### Managed Identity 使用
-本番環境では、Functions App の Managed Identity を有効化し、以下のように Key Vault から Secrets を取得：
+### Using Managed Identity
+In production, enable Functions App Managed Identity and retrieve secrets from Key Vault:
 
 ```csharp
 // Program.cs
@@ -96,10 +96,10 @@ if (!string.IsNullOrEmpty(keyVaultUri))
 }
 ```
 
-**注意**: Azure Functions Worker SDK 1.18.1 を使用する場合、`Azure.Extensions.AspNetCore.Configuration.Secrets` v1.3.2 パッケージが必要です。
+**Note**: When using Azure Functions Worker SDK 1.18.1, `Azure.Extensions.AspNetCore.Configuration.Secrets` v1.3.2 package is required.
 
-### Key Vault Secret
-- `SharePointClientSecret`（SharePoint アプリのクライアントシークレット）s 名
+### Key Vault Secrets
+- `SharePointClientSecret` (SharePoint app client secret)
 - `CosmosDbConnectionString`
 - `BlobStorageConnectionString`
 - `SpeechServiceKey`
@@ -107,16 +107,16 @@ if (!string.IsNullOrEmpty(keyVaultUri))
 - `OpenAIKey`
 - `SearchServiceKey`
 
-### RBAC 設定
-Functions App の Managed Identity に以下のロールを付与：
-- **Cosmos DB**：Cosmos DB Built-in Data Contributor
-- **Blob Storage**：Storage Blob Data Contributor
-- **Key Vault**：Key Vault Secrets User
-- **AI Search**：Search Index Data Contributor
+### RBAC Configuration
+Grant the following roles to Functions App Managed Identity:
+- **Cosmos DB**: Cosmos DB Built-in Data Contributor
+- **Blob Storage**: Storage Blob Data Contributor
+- **Key Vault**: Key Vault Secrets User
+- **AI Search**: Search Index Data Contributor
 
-## 環境別パラメータ
+## Environment-Specific Parameters
 
-### 開発環境（`infra/params.dev.json`）
+### Dev Environment (`infra/params.dev.json`)
 ```json
 {
   "environment": "dev",
@@ -125,7 +125,7 @@ Functions App の Managed Identity に以下のロールを付与：
 }
 ```
 
-### 本番環境（`infra/params.prod.json`）
+### Production Environment (`infra/params.prod.json`)
 ```json
 {
   "environment": "prod",
@@ -135,11 +135,11 @@ Functions App の Managed Identity に以下のロールを付与：
 }
 ```
 
-## Azure 上での操作手順
+## Azure Operations
 
-### 前提条件
+### Prerequisites
 
-以下のツールをインストール：
+Install the following tools:
 ```bash
 # Azure CLI
 winget install -e --id Microsoft.AzureCLI
@@ -151,27 +151,27 @@ winget install -e --id Microsoft.Azd
 npm install -g azure-functions-core-tools@4 --unsafe-perm true
 ```
 
-Azure にログイン：
+Login to Azure:
 ```bash
 az login
 az account set --subscription "<your-subscription-id>"
 ```
 
-### 1. Bicep を使用したリソースデプロイ
+### 1. Deploy Resources with Bicep
 
-#### 開発環境のデプロイ
+#### Deploy Dev Environment
 ```bash
-# リソースグループの作成
+# Create resource group
 az group create --name rg-salesanalytics-dev --location japaneast
 
-# Bicep テンプレートのデプロイ
+# Deploy Bicep template
 az deployment sub create \
   --location japaneast \
   --template-file infra/main.bicep \
   --parameters infra/params.dev.json
 ```
 
-#### 本番環境のデプロイ
+#### Deploy Production Environment
 ```bash
 az group create --name rg-salesanalytics-prod --location japaneast
 
@@ -181,14 +181,14 @@ az deployment sub create \
   --parameters infra/params.prod.json
 ```
 
-### 2. Key Vault へのシークレット登録
+### 2. Register Secrets in Key Vault
 
 ```bash
-# 変数設定
+# Set variables
 RESOURCE_GROUP="rg-salesanalytics-dev"
 KEY_VAULT_NAME="kv-salesanalytics-dev"
 
-# Cosmos DB 接続文字列
+# Cosmos DB connection string
 COSMOS_CONN=$(az cosmosdb keys list \
   --name cosmos-salesanalytics-dev \
   --resource-group $RESOURCE_GROUP \
@@ -200,7 +200,7 @@ az keyvault secret set \
   --name CosmosDbConnectionString \
   --value "$COSMOS_CONN"
 
-# Blob Storage 接続文字列
+# Blob Storage connection string
 BLOB_CONN=$(az storage account show-connection-string \
   --name stgalesanalyticsdev \
   --resource-group $RESOURCE_GROUP \
@@ -211,7 +211,7 @@ az keyvault secret set \
   --name BlobStorageConnectionString \
   --value "$BLOB_CONN"
 
-# Speech Service キー
+# Speech Service key
 SPEECH_KEY=$(az cognitiveservices account keys list \
   --name speech-salesanalytics-dev \
   --resource-group $RESOURCE_GROUP \
@@ -222,7 +222,7 @@ az keyvault secret set \
   --name SpeechServiceKey \
   --value "$SPEECH_KEY"
 
-# Language Service キー
+# Language Service key
 LANGUAGE_KEY=$(az cognitiveservices account keys list \
   --name language-salesanalytics-dev \
   --resource-group $RESOURCE_GROUP \
@@ -233,7 +233,7 @@ az keyvault secret set \
   --name LanguageServiceKey \
   --value "$LANGUAGE_KEY"
 
-# OpenAI キー
+# OpenAI key
 OPENAI_KEY=$(az cognitiveservices account keys list \
   --name openai-salesanalytics-dev \
   --resource-group $RESOURCE_GROUP \
@@ -244,16 +244,9 @@ az keyvault secret set \
   --name OpenAIKey \
   --value "$OPENAI_KEY"
 
-# AI Search キー
+# AI Search key
 SEARCH_KEY=$(az search admin-key show \
   --service-name search-salesanalytics-dev \
-
-# SharePoint Client Secret（手動で設定）
-# Azure Portal でアプリ登録から取得したクライアントシークレットを設定
-az keyvault secret set \
-  --vault-name $KEY_VAULT_NAME \
-  --name SharePointClientSecret \
-  --value "<your-sharepoint-client-secret>"
   --resource-group $RESOURCE_GROUP \
   --query primaryKey -o tsv)
 
@@ -261,26 +254,33 @@ az keyvault secret set \
   --vault-name $KEY_VAULT_NAME \
   --name SearchServiceKey \
   --value "$SEARCH_KEY"
+
+# SharePoint Client Secret (manual setup)
+# Set client secret obtained from app registration in Azure Portal
+az keyvault secret set \
+  --vault-name $KEY_VAULT_NAME \
+  --name SharePointClientSecret \
+  --value "<your-sharepoint-client-secret>"
 ```
 
-### 3. Functions App の Managed Identity 設定
+### 3. Configure Functions App Managed Identity
 
 ```bash
 FUNCTION_APP_NAME="func-salesanalytics-dev"
 
-# システム割り当てマネージド ID を有効化
+# Enable system-assigned managed identity
 az functionapp identity assign \
   --name $FUNCTION_APP_NAME \
   --resource-group $RESOURCE_GROUP
 
-# Managed Identity のプリンシパル ID を取得
+# Get principal ID of Managed Identity
 PRINCIPAL_ID=$(az functionapp identity show \
   --name $FUNCTION_APP_NAME \
   --resource-group $RESOURCE_GROUP \
   --query principalId -o tsv)
 ```
 
-### 4. RBAC ロールの付与
+### 4. Grant RBAC Roles
 
 ```bash
 # Key Vault Secrets User
@@ -325,10 +325,10 @@ az role assignment create \
   --scope $SEARCH_ID
 ```
 
-### 5. Functions App の環境変数設定
+### 5. Configure Functions App Environment Variables
 
 ```bash
-# Application Settings の設定
+# Configure Application Settings
 az functionapp config appsettings set \
   --name $FUNCTION_APP_NAME \
   --resource-group $RESOURCE_GROUP \
@@ -336,10 +336,6 @@ az functionapp config appsettings set \
     FUNCTIONS_WORKER_RUNTIME=dotnet-isolated \
     CosmosDbDatabaseName=SalesAnalytics \
     CosmosDbSessionsContainerName=sessions \
-    "SharePoint:TenantId=<your-tenant-id>" \
-    "SharePoint:ClientId=<your-sharepoint-client-id>" \
-    "SharePoint:SiteUrl=https://<tenant>.sharepoint.com/sites/<site>" \
-    "SharePoint:LibraryName=RolePlayTranscripts" \
     CosmosDbAuditContainerName=label_audit \
     BlobContainerName=audio-uploads \
     SpeechServiceEndpoint=https://japaneast.api.cognitive.microsoft.com/ \
@@ -349,11 +345,12 @@ az functionapp config appsettings set \
     SearchServiceEndpoint=https://search-salesanalytics-dev.search.windows.net \
     SearchIndexName=sessions-index \
     KeyVaultUri=https://kv-salesanalytics-dev.vault.azure.net/ \
-    "SharePoint:ClientSecret=@Microsoft.KeyVault(SecretUri=https://kv-salesanalytics-dev.vault.azure.net/secrets/SharePointClientSecret/)"
-```
+    "SharePoint:TenantId=<your-tenant-id>" \
+    "SharePoint:ClientId=<your-sharepoint-client-id>" \
+    "SharePoint:SiteUrl=https://<tenant>.sharepoint.com/sites/<site>" \
+    "SharePoint:LibraryName=RolePlayTranscripts"
 
-**注意**: SharePoint 連携の詳細なセットアップ手順については、[SHAREPOINT_SETUP.md](SHAREPOINT_SETUP.md) を参照してください。
-# Key Vault 参照形式での設定（推奨）
+# Configure with Key Vault references (recommended)
 az functionapp config appsettings set \
   --name $FUNCTION_APP_NAME \
   --resource-group $RESOURCE_GROUP \
@@ -363,43 +360,46 @@ az functionapp config appsettings set \
     SpeechServiceKey="@Microsoft.KeyVault(SecretUri=https://kv-salesanalytics-dev.vault.azure.net/secrets/SpeechServiceKey/)" \
     LanguageServiceKey="@Microsoft.KeyVault(SecretUri=https://kv-salesanalytics-dev.vault.azure.net/secrets/LanguageServiceKey/)" \
     OpenAIKey="@Microsoft.KeyVault(SecretUri=https://kv-salesanalytics-dev.vault.azure.net/secrets/OpenAIKey/)" \
-    SearchServiceKey="@Microsoft.KeyVault(SecretUri=https://kv-salesanalytics-dev.vault.azure.net/secrets/SearchServiceKey/)"
+    SearchServiceKey="@Microsoft.KeyVault(SecretUri=https://kv-salesanalytics-dev.vault.azure.net/secrets/SearchServiceKey/)" \
+    "SharePoint:ClientSecret=@Microsoft.KeyVault(SecretUri=https://kv-salesanalytics-dev.vault.azure.net/secrets/SharePointClientSecret/)"
 ```
 
-### 6. Functions App のデプロイ
+**Note**: For detailed SharePoint integration setup instructions, see [SHAREPOINT_SETUP.en.md](SHAREPOINT_SETUP.en.md).
+
+### 6. Deploy Functions App
 
 ```bash
-# ビルドと発行
+# Build and publish
 cd api/FunctionsApp
 dotnet publish -c Release -o ./bin/publish
 
-# Azure へデプロイ
+# Deploy to Azure
 cd bin/publish
 func azure functionapp publish $FUNCTION_APP_NAME --dotnet-isolated
 ```
 
-または VS Code から：
-1. Azure Functions 拡張機能をインストール
-2. サイドバーの Azure アイコンをクリック
-3. Functions App を右クリック → "Deploy to Function App"
+Or from VS Code:
+1. Install Azure Functions extension
+2. Click Azure icon in sidebar
+3. Right-click Functions App → "Deploy to Function App"
 
-### 7. フロントエンド（Static Web Apps）のデプロイ
+### 7. Deploy Frontend (Static Web Apps)
 
 ```bash
-# Static Web App の作成
+# Create Static Web App
 az staticwebapp create \
   --name swa-salesanalytics-dev \
   --resource-group $RESOURCE_GROUP \
   --location eastasia \
   --sku Free
 
-# デプロイトークンの取得
+# Get deployment token
 DEPLOYMENT_TOKEN=$(az staticwebapp secrets list \
   --name swa-salesanalytics-dev \
   --resource-group $RESOURCE_GROUP \
   --query properties.apiKey -o tsv)
 
-# GitHub Actions でデプロイ（または手動デプロイ）
+# Deploy with GitHub Actions (or manual deployment)
 cd frontend
 npm install -g @azure/static-web-apps-cli
 
@@ -408,7 +408,7 @@ swa deploy ./out \
   --env production
 ```
 
-### 8. 環境変数の設定（Static Web Apps）
+### 8. Configure Environment Variables (Static Web Apps)
 
 ```bash
 # Application Settings
@@ -422,16 +422,16 @@ az staticwebapp appsettings set \
     AZURE_AD_CLIENT_SECRET=<your-client-secret>
 ```
 
-### 9. Cosmos DB のコンテナ作成
+### 9. Create Cosmos DB Containers
 
 ```bash
-# データベース作成
+# Create database
 az cosmosdb sql database create \
   --account-name cosmos-salesanalytics-dev \
   --resource-group $RESOURCE_GROUP \
   --name SalesAnalytics
 
-# sessions コンテナ作成
+# Create sessions container
 az cosmosdb sql container create \
   --account-name cosmos-salesanalytics-dev \
   --resource-group $RESOURCE_GROUP \
@@ -440,7 +440,7 @@ az cosmosdb sql container create \
   --partition-key-path /userId \
   --throughput 400
 
-# label_audit コンテナ作成
+# Create label_audit container
 az cosmosdb sql container create \
   --account-name cosmos-salesanalytics-dev \
   --resource-group $RESOURCE_GROUP \
@@ -450,11 +450,11 @@ az cosmosdb sql container create \
   --throughput 400
 ```
 
-### 10. AI Search インデックスの作成
+### 10. Create AI Search Index
 
 ```bash
-# インデックス定義 JSON ファイルを作成（sessions-index.json）
-# Azure Portal または REST API でインデックスを作成
+# Create index definition JSON file (sessions-index.json)
+# Create index via Azure Portal or REST API
 az search index create \
   --service-name search-salesanalytics-dev \
   --resource-group $RESOURCE_GROUP \
@@ -462,16 +462,16 @@ az search index create \
   --fields @infra/search-index-schema.json
 ```
 
-### 11. Application Insights の確認
+### 11. Verify Application Insights
 
 ```bash
-# Application Insights の接続文字列を取得
+# Get Application Insights connection string
 APPINSIGHTS_CONN=$(az monitor app-insights component show \
   --app appi-salesanalytics-dev \
   --resource-group $RESOURCE_GROUP \
   --query connectionString -o tsv)
 
-# Functions App に設定
+# Configure in Functions App
 az functionapp config appsettings set \
   --name $FUNCTION_APP_NAME \
   --resource-group $RESOURCE_GROUP \
@@ -479,63 +479,60 @@ az functionapp config appsettings set \
     APPLICATIONINSIGHTS_CONNECTION_STRING="$APPINSIGHTS_CONN"
 ```
 
-### 12. 動作確認
+### 12. Verify Operation
 
 ```bash
-# Functions App のエンドポイント確認
+# Verify Functions App endpoint
 az functionapp show \
   --name $FUNCTION_APP_NAME \
   --resource-group $RESOURCE_GROUP \
   --query defaultHostName -o tsv
 
-# Static Web Apps のエンドポイント確認
+# Verify Static Web Apps endpoint
 az staticwebapp show \
   --name swa-salesanalytics-dev \
   --resource-group $RESOURCE_GROUP \
   --query defaultHostname -o tsv
 
-# ログストリーミング
+# Stream logs
 az functionapp log tail \
   --name $FUNCTION_APP_NAME \
   --resource-group $RESOURCE_GROUP
 ```
 
-### PowerShell での一括設定スクリプト例
+### PowerShell Batch Setup Script Example
 
 ```powershell
-# 変数設定
+# Set variables
 $ResourceGroup = "rg-salesanalytics-dev"
 $Location = "japaneast"
 $FunctionAppName = "func-salesanalytics-dev"
 $KeyVaultName = "kv-salesanalytics-dev"
 
-# Managed Identity 有効化と RBAC 設定
+# Enable Managed Identity and configure RBAC
 $principalId = (az functionapp identity assign `
   --name $FunctionAppName `
   --resource-group $ResourceGroup `
   --query principalId -o tsv)
 
-# Key Vault アクセス許可
+# Grant Key Vault access
 az keyvault set-policy `
   --name $KeyVaultName `
   --object-id $principalId `
   --secret-permissions get list
 
-Write-Host "✅ Azure リソースの設定が完了しました"
+Write-Host "✅ Azure resource configuration completed"
 ```
 
-## トラブルシューティング
+## Troubleshooting
 
-### 必要な NuGet パッケージ
+### Required NuGet Packages
 
-プロジェクトで使用している主要な NuGet パッケージ：
+Main NuGet packages used in the project:
 
 ```xml
 <!-- Azure Functions Core -->
-<PackSharePoint Integration -->
-<PackageReference Include="Microsoft.Graph" Version="5.86.0" />
-
-<!-- ageReference Include="Microsoft.Azure.Functions.Worker" Version="1.24.0" />
+<PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.24.0" />
 <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.18.1" />
 <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.2.0" />
 <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.DurableTask" Version="1.1.5" />
@@ -550,6 +547,9 @@ Write-Host "✅ Azure リソースの設定が完了しました"
 <PackageReference Include="Azure.AI.OpenAI" Version="2.1.0" />
 <PackageReference Include="Azure.AI.TextAnalytics" Version="5.3.0" />
 
+<!-- SharePoint Integration -->
+<PackageReference Include="Microsoft.Graph" Version="5.86.0" />
+
 <!-- Configuration & Extensions -->
 <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.1" />
 <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.3.2" />
@@ -560,49 +560,49 @@ Write-Host "✅ Azure リソースの設定が完了しました"
 <PackageReference Include="FluentValidation" Version="11.11.0" />
 ```
 
-パッケージのインストール：
+Install packages:
 ```bash
 cd api/FunctionsApp
 dotnet restore
 ```
 
-### Azurite（ローカル開発）
-Windows の場合、Azurite を別途起動：
+### Azurite (Local Development)
+On Windows, start Azurite separately:
 ```bash
 npm install -g azurite
 azurite --silent --location c:\azurite --debug c:\azurite\debug.log
 ```
 
 ### Cosmos DB Emulator
-ローカル開発時は Cosmos DB Emulator を使用可能：
+Cosmos DB Emulator can be used for local development:
 ```bash
-# 接続文字列
+# Connection string
 AccountEndpoint=https://localhost:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==
 ```
 
-### Functions のログ確認
+### Verify Functions Logs
 ```bash
 cd api/FunctionsApp
 func start --verbose
 ```
 
-Application Insights のログは Azure Portal で確認。
+Check Application Insights logs in Azure Portal.
 
-### Windows ARM64 環境での問題
+### Windows ARM64 Environment Issues
 
-Windows ARM64 環境で `func start` を実行すると、以下のエラーが表示される場合があります：
+When running `func start` on Windows ARM64, you may see the following error:
 
 ```
 Could not load file or assembly 'Microsoft.Azure.Functions.Platform.Metrics.LinuxConsumption'
 ```
 
-**対処法**：
+**Solutions**:
 
-1. **VS Code タスクから実行**（推奨）
-   - `Ctrl+Shift+P` → `Tasks: Run Task` → `build (functions)` を実行
-   - Functions が自動的に起動します
+1. **Run from VS Code Task** (recommended)
+   - `Ctrl+Shift+P` → `Tasks: Run Task` → `build (functions)`
+   - Functions will start automatically
 
-2. **ビルド出力ディレクトリから実行**
+2. **Run from build output directory**
    ```bash
    cd api/FunctionsApp
    dotnet build
@@ -610,8 +610,8 @@ Could not load file or assembly 'Microsoft.Azure.Functions.Platform.Metrics.Linu
    func host start
    ```
 
-3. **エラーメッセージを無視**
-   - エラーメッセージは表示されますが、Functions は正常に動作します
-   - `http://localhost:7071` でエンドポイントが起動していることを確認
+3. **Ignore error message**
+   - Error message appears but Functions operate normally
+   - Verify endpoints are running at `http://localhost:7071`
 
-これは Azure Functions Core Tools 4.6.0 の Windows ARM64 環境における既知の制限です。
+This is a known limitation of Azure Functions Core Tools 4.6.0 on Windows ARM64 environments.

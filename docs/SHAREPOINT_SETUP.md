@@ -1,5 +1,7 @@
 # SharePoint 連携セットアップガイド
 
+> **Language**: [English](SHAREPOINT_SETUP.en.md) | [日本語](SHAREPOINT_SETUP.md)
+
 このドキュメントでは、営業ロールプレイ教材用にトランスクリプトをSharePoint Onlineに自動アップロードするための設定手順を説明します。
 
 ## 前提条件

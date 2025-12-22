@@ -1,5 +1,7 @@
 # Sales Analytics - MVP
 
+> **Language**: [English](README.en.md) | [日本語](README.md)
+
 自動車ディーラー向け商談音声分析システム（MVP版）
 
 ## 概要

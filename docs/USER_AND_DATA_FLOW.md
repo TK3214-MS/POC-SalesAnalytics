@@ -1,5 +1,7 @@
 # Sales Analytics システム - ユーザーフロー & データフロー詳細解説
 
+> **Language**: [English](USER_AND_DATA_FLOW.en.md) | [日本語](USER_AND_DATA_FLOW.md)
+
 ## 📖 目次
 
 1. [システム概要](#システム概要)
