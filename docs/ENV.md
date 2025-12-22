@@ -49,6 +49,12 @@ AZURE_AD_CLIENT_SECRET=<your-azure-ad-client-secret>
     "SearchServiceKey": "<search-admin-key>",
     "SearchIndexName": "sessions-index",
     
+    "SharePoint:TenantId": "<your-tenant-id>",
+    "SharePoint:ClientId": "<your-sharepoint-app-client-id>",
+    "SharePoint:ClientSecret": "<your-sharepoint-app-client-secret>",
+    "SharePoint:SiteUrl": "https://<your-tenant>.sharepoint.com/sites/<site-name>",
+    "SharePoint:LibraryName": "RolePlayTranscripts",
+    
     "KeyVaultUri": "https://<your-keyvault>.vault.azure.net/"
   }
 }
@@ -63,6 +69,12 @@ AZURE_AD_CLIENT_SECRET=<your-azure-ad-client-secret>
 - **Language Service**：PII検出、感情分析
 - **OpenAI**：GPT-4o で要約
 - **AI Search**：ベクトル検索用
+- **SharePoint**：営業ロールプレイ用トランスクリプトの保存
+  - `TenantId`：Microsoft Entra ID のテナントID
+  - `ClientId`：SharePoint アクセス用アプリのクライアントID
+  - `ClientSecret`：アプリのクライアントシークレット
+  - `SiteUrl`：SharePoint サイトの完全なURL
+  - `LibraryName`：ドキュメントライブラリ名（例: `RolePlayTranscripts`）
 - **Key Vault**：本番環境では Managed Identity で Secrets 取得
 
 ## 本番環境（Azure）
@@ -84,7 +96,8 @@ if (!string.IsNullOrEmpty(keyVaultUri))
 
 **注意**: Azure Functions Worker SDK 1.18.1 を使用する場合、`Azure.Extensions.AspNetCore.Configuration.Secrets` v1.3.2 パッケージが必要です。
 
-### Key Vault Secrets 名
+### Key Vault Secret
+- `SharePointClientSecret`（SharePoint アプリのクライアントシークレット）s 名
 - `CosmosDbConnectionString`
 - `BlobStorageConnectionString`
 - `SpeechServiceKey`
@@ -232,6 +245,13 @@ az keyvault secret set \
 # AI Search キー
 SEARCH_KEY=$(az search admin-key show \
   --service-name search-salesanalytics-dev \
+
+# SharePoint Client Secret（手動で設定）
+# Azure Portal でアプリ登録から取得したクライアントシークレットを設定
+az keyvault secret set \
+  --vault-name $KEY_VAULT_NAME \
+  --name SharePointClientSecret \
+  --value "<your-sharepoint-client-secret>"
   --resource-group $RESOURCE_GROUP \
   --query primaryKey -o tsv)
 
@@ -314,6 +334,10 @@ az functionapp config appsettings set \
     FUNCTIONS_WORKER_RUNTIME=dotnet-isolated \
     CosmosDbDatabaseName=SalesAnalytics \
     CosmosDbSessionsContainerName=sessions \
+    "SharePoint:TenantId=<your-tenant-id>" \
+    "SharePoint:ClientId=<your-sharepoint-client-id>" \
+    "SharePoint:SiteUrl=https://<tenant>.sharepoint.com/sites/<site>" \
+    "SharePoint:LibraryName=RolePlayTranscripts" \
     CosmosDbAuditContainerName=label_audit \
     BlobContainerName=audio-uploads \
     SpeechServiceEndpoint=https://japaneast.api.cognitive.microsoft.com/ \
@@ -322,8 +346,11 @@ az functionapp config appsettings set \
     OpenAIDeploymentName=gpt-4o \
     SearchServiceEndpoint=https://search-salesanalytics-dev.search.windows.net \
     SearchIndexName=sessions-index \
-    KeyVaultUri=https://kv-salesanalytics-dev.vault.azure.net/
+    KeyVaultUri=https://kv-salesanalytics-dev.vault.azure.net/ \
+    "SharePoint:ClientSecret=@Microsoft.KeyVault(SecretUri=https://kv-salesanalytics-dev.vault.azure.net/secrets/SharePointClientSecret/)"
+```
 
+**注意**: SharePoint 連携の詳細なセットアップ手順については、[SHAREPOINT_SETUP.md](SHAREPOINT_SETUP.md) を参照してください。
 # Key Vault 参照形式での設定（推奨）
 az functionapp config appsettings set \
   --name $FUNCTION_APP_NAME \
@@ -503,7 +530,10 @@ Write-Host "✅ Azure リソースの設定が完了しました"
 
 ```xml
 <!-- Azure Functions Core -->
-<PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.24.0" />
+<PackSharePoint Integration -->
+<PackageReference Include="Microsoft.Graph" Version="5.86.0" />
+
+<!-- ageReference Include="Microsoft.Azure.Functions.Worker" Version="1.24.0" />
 <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.18.1" />
 <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.2.0" />
 <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.DurableTask" Version="1.1.5" />

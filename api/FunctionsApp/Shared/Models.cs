@@ -46,6 +46,9 @@ public class Session
     [JsonPropertyName("outcomeLabelRequest")]
     public OutcomeLabelRequest? OutcomeLabelRequest { get; set; }
 
+    [JsonPropertyName("sharePointUrl")]
+    public string? SharePointUrl { get; set; }
+
     [JsonPropertyName("ttl")]
     public int Ttl { get; set; } = 2592000; // 30 days
 }

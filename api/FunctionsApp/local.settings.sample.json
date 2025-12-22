@@ -26,6 +26,12 @@
     "SearchServiceKey": "YOUR_SEARCH_ADMIN_KEY",
     "SearchIndexName": "sessions-index",
     
+    "SharePoint:TenantId": "YOUR_TENANT_ID",
+    "SharePoint:ClientId": "YOUR_CLIENT_ID",
+    "SharePoint:ClientSecret": "YOUR_CLIENT_SECRET",
+    "SharePoint:SiteUrl": "https://yourtenant.sharepoint.com/sites/YourSite",
+    "SharePoint:LibraryName": "Documents",
+    
     "KeyVaultUri": ""
   }
 }

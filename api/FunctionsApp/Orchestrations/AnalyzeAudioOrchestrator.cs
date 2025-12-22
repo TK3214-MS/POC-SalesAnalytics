@@ -58,16 +58,37 @@ public class AnalyzeAudioOrchestrator
                     SummaryKeyPoints = string.Join(" ", summary.KeyPoints)
                 });
 
-            // 6. Session 更新（完了）
+            // 6. SharePoint にトランスクリプトをアップロード
+            string? sharePointUrl = null;
+            try
+            {
+                sharePointUrl = await context.CallActivityAsync<string>(
+                    nameof(Activities.UploadToSharePointActivity),
+                    new Activities.UploadToSharePointInput
+                    {
+                        SessionId = input.SessionId,
+                        UserId = input.UserId
+                    });
+                
+                logger.LogInformation($"Transcript uploaded to SharePoint: {sharePointUrl}");
+            }
+            catch (Exception ex)
+            {
+                // SharePointアップロードが失敗してもオーケストレーション全体は失敗させない
+                logger.LogWarning($"Failed to upload to SharePoint (non-critical): {ex.Message}");
+            }
+
+            // 7. Session 更新（完了）
             var session = await _cosmosRepo.GetSessionAsync(input.SessionId, input.UserId);
             session.Status = "completed";
             session.Transcription = transcription;
             session.PiiMasked = piiMasked;
             session.Sentiment = sentiment;
             session.Summary = summary;
+            session.SharePointUrl = sharePointUrl;
             await _cosmosRepo.UpdateSessionAsync(session);
 
-            // 7. 音声原本削除
+            // 8. 音声原本削除
             if (!string.IsNullOrEmpty(input.BlobName))
             {
                 await _blobRepo.DeleteAudioAsync(input.BlobName);

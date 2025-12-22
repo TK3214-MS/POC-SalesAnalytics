@@ -28,6 +28,7 @@ var host = new HostBuilder()
         services.AddSingleton<CosmosRepository>();
         services.AddSingleton<SearchRepository>();
         services.AddSingleton<BlobRepository>();
+        services.AddSingleton<SharePointRepository>();
 
         // AI Clients
         services.AddSingleton<SpeechClient>();

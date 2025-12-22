@@ -12,6 +12,7 @@
 - RAG類似商談検索
 - Outcome（成約/失注/保留/中止）二段階承認ワークフロー
 - KPIダッシュボード（成約率等）
+- **SharePoint Online連携（営業ロールプレイ教材の自動生成）**
 
 ## 技術スタック
 
@@ -43,6 +44,8 @@
   - Azure Cosmos DB（NoSQL）v3.45.0
   - Azure Blob Storage（音声ファイル一時保存）v12.23.0
   - Azure Key Vault（Secrets管理）v4.8.0
+- SharePoint 連携
+  - Microsoft Graph v5.86.0（SharePoint Online API）
 - バリデーション & ユーティリティ
   - FluentValidation v11.11.0
 
@@ -188,6 +191,15 @@ Azure OpenAI（GPT-4o）でJSON構造化出力：
 ### 8. RAG 類似商談検索
 Azure AI Search でベクトル索引・検索（最小実装）。
 
+### 9. SharePoint Online連携（営業ロールプレイ教材）
+音声分析完了後、自動的にMarkdown形式のトランスクリプトをSharePoint Onlineにアップロード：
+- **Markdownコンテンツ**：基本情報、会話トランスクリプト、感情分析、AI要約、成約結果、ロールプレイガイドを含む
+- **自動フォルダ作成**：店舗ID（storeId）ごとにフォルダを自動生成
+- **セキュア認証**：Azure AD (Microsoft Entra ID) アプリ登録によるクライアント認証
+- **Copilot Studio Lite連携**：SharePointに保存されたトランスクリプトを参照し、AIエージェントによるリアルな営業ロールプレイが可能
+
+詳細なセットアップ手順は [docs/SHAREPOINT_SETUP.md](docs/SHAREPOINT_SETUP.md) を参照。
+
 ## MVP 対象外（TODO）
 以下は将来拡張としてTODOコメントに記載：
 - Repeat（90日）ワークフロー・通知
@@ -220,6 +232,7 @@ Azure AI Search でベクトル索引・検索（最小実装）。
 - **入力バリデーション**：
   - .NET：FluentValidation v11.11.0
   - TypeScript：Zod v3.24.1
+- [SHAREPOINT_SETUP.md](docs/SHAREPOINT_SETUP.md) - SharePoint Online連携のセットアップ
 - **エラー**：traceId付きで返却
 - **LLM**：JSON Schema強制 + プロンプトインジェクション対策
 - **PII保護**：Azure AI Language v5.3.0 で検出・マスキング後に索引
