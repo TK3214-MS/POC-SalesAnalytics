@@ -5,6 +5,13 @@ import { Sidebar } from '@/components/Sidebar';
 export const metadata: Metadata = {
   title: 'Sales Analytics - 商談音声分析',
   description: '自動車ディーラー向け商談音声分析システム',
+  icons: {
+    icon: [
+      { url: '/assets/logo/Top.png' },
+      { url: '/favicon.png', sizes: 'any' },
+    ],
+    apple: '/assets/logo/Top.png',
+  },
 };
 
 export default function RootLayout({
@@ -14,8 +21,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja" suppressHydrationWarning>
-      <body className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white">
-        <div className="min-h-screen backdrop-blur-xs">
+      <body className="min-h-screen bg-white text-black">
+        <div className="min-h-screen">
           <Sidebar />
           <main className="ml-64">
             {children}

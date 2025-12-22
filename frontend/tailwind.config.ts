@@ -9,23 +9,23 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Base colors
-        background: '#0f172a',
-        foreground: '#f8fafc',
-        border: 'rgba(255, 255, 255, 0.1)',
-        // Liquid Glass palette
+        // Base colors - Clean white/black theme
+        background: '#ffffff',
+        foreground: '#000000',
+        border: 'rgba(0, 0, 0, 0.1)',
+        // Clean palette
         glass: {
-          50: 'rgba(255, 255, 255, 0.05)',
-          100: 'rgba(255, 255, 255, 0.1)',
-          200: 'rgba(255, 255, 255, 0.2)',
-          300: 'rgba(255, 255, 255, 0.3)',
+          50: 'rgba(0, 0, 0, 0.02)',
+          100: 'rgba(0, 0, 0, 0.05)',
+          200: 'rgba(0, 0, 0, 0.08)',
+          300: 'rgba(0, 0, 0, 0.12)',
         },
         primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
+          50: '#f5f5f5',
+          100: '#e5e5e5',
+          500: '#404040',
+          600: '#262626',
+          700: '#171717',
         },
         success: '#10b981',
         warning: '#f59e0b',

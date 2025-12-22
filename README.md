@@ -25,6 +25,9 @@
 - Zod 3.24.1（バリデーション）
 - date-fns 4.1.0（日付処理）
 - recharts 2.15.0（グラフ表示）
+- デザイン:クリーンなホワイト/ブラック基調
+- アイコン:/frontend/public/assets/logo 配下のPNG画像(case.png, KPI.png, Voice.png, Approval.png)
+- ファビコン:Top.png
 
 **Backend**
 - Azure Functions v4 (.NET 8 Isolated)
