@@ -72,8 +72,8 @@ export function AudioUploadDropzone() {
           {file ? (
             <div className="space-y-4">
               <div className="text-4xl">🎵</div>
-              <p className="text-lg font-semibold">{file.name}</p>
-              <p className="text-sm text-gray-400">
+              <p className="text-lg font-semibold text-black">{file.name}</p>
+              <p className="text-sm text-gray-600">
                 {(file.size / 1024 / 1024).toFixed(2)} MB
               </p>
               <div className="flex gap-4 justify-center">
@@ -92,8 +92,8 @@ export function AudioUploadDropzone() {
           ) : (
             <div className="space-y-4">
               <div className="text-6xl">🎤</div>
-              <p className="text-xl">音声ファイルをドロップ</p>
-              <p className="text-sm text-gray-400">または</p>
+              <p className="text-xl text-black">音声ファイルをドロップ</p>
+              <p className="text-sm text-gray-600">または</p>
               <label className="inline-block">
                 <input
                   type="file"

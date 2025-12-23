@@ -3,16 +3,18 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-
-const navigation = [
-  { name: '音声解析', href: '/upload', icon: '/assets/logo/Voice.png' },
-  { name: '商談一覧', href: '/sessions', icon: '/assets/logo/case.png' },
-  { name: '承認キュー', href: '/approvals', icon: '/assets/logo/Approval.png' },
-  { name: 'KPIダッシュボード', href: '/kpi', icon: '/assets/logo/KPI.png' },
-];
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { t } = useLanguage();
+
+  const navigation = [
+    { name: t.nav.upload, href: '/upload', icon: '/assets/logo/Voice.png' },
+    { name: t.nav.sessions, href: '/sessions', icon: '/assets/logo/case.png' },
+    { name: t.nav.approvals, href: '/approvals', icon: '/assets/logo/Approval.png' },
+    { name: t.nav.kpi, href: '/kpi', icon: '/assets/logo/KPI.png' },
+  ];
 
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-white border-r border-gray-200 flex flex-col shadow-sm">
@@ -21,8 +23,8 @@ export function Sidebar() {
         <Link href="/" className="flex items-center gap-3">
           <Image src="/assets/logo/Top.png" alt="Logo" width={32} height={32} className="object-contain" />
           <div>
-            <h1 className="text-xl font-bold text-black">Sales Analytics</h1>
-            <p className="text-xs text-gray-500">商談分析システム</p>
+            <h1 className="text-xl font-bold text-black">{t.nav.appName}</h1>
+            <p className="text-xs text-gray-500">{t.nav.appDescription}</p>
           </div>
         </Link>
       </div>
@@ -36,19 +38,22 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={`
-                flex items-center gap-3 px-4 py-3 rounded-lg transition-all
+                flex items-center gap-3 px-4 py-3 rounded-lg transition-all relative
                 ${isActive 
-                  ? 'bg-black text-white shadow-md' 
-                  : 'text-gray-700 hover:bg-gray-100'
+                  ? 'text-black font-medium' 
+                  : 'text-gray-700 hover:bg-gray-50'
                 }
               `}
             >
+              {isActive && (
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-black via-gray-700 to-black rounded-r-full" />
+              )}
               <Image 
                 src={item.icon} 
                 alt={item.name} 
                 width={24} 
                 height={24} 
-                className={`object-contain ${isActive ? 'brightness-0 invert' : ''}`}
+                className={`object-contain ${isActive ? '' : ''}`}
               />
               <span className="font-medium">{item.name}</span>
             </Link>
@@ -63,7 +68,7 @@ export function Sidebar() {
             D
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-black truncate">Demo User</p>
+            <p className="text-sm font-medium text-black truncate">{t.user.demoUser}</p>
             <p className="text-xs text-gray-500 truncate">demo@example.com</p>
           </div>
         </div>

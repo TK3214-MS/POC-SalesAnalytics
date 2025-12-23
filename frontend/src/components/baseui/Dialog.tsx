@@ -32,7 +32,7 @@ export function Dialog({ open, onClose, title, children }: DialogProps) {
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg animate-slide-up">
         <div className="rounded-2xl backdrop-blur-xl bg-slate-900/90 border border-white/20 shadow-2xl p-6 space-y-4">
           {title && (
-            <h2 className="text-2xl font-bold">
+            <h2 className="text-2xl font-bold text-white">
               {title}
             </h2>
           )}

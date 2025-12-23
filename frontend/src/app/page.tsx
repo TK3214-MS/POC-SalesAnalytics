@@ -5,6 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { GlassCard } from '@/components/glass/GlassCard';
 import { apiClient } from '@/app/api-proxy';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { PageHeader } from '@/components/PageHeader';
 
 interface DashboardStats {
   totalSessions: number;
@@ -19,6 +21,7 @@ interface DashboardStats {
 }
 
 export default function HomePage() {
+  const { t } = useLanguage();
   const [stats, setStats] = useState<DashboardStats>({
     totalSessions: 0,
     pendingApprovals: 0,
@@ -58,12 +61,10 @@ export default function HomePage() {
   return (
     <div className="min-h-screen p-8 bg-gray-50">
       <div className="max-w-7xl mx-auto space-y-8 animate-fade-in">
-        <header className="space-y-2">
-          <h1 className="text-4xl font-bold text-black">ダッシュボード</h1>
-          <p className="text-gray-600">
-            商談音声を分析し、成約率向上を支援
-          </p>
-        </header>
+        <PageHeader 
+          title={t.dashboard.title}
+          subtitle={t.dashboard.subtitle}
+        />
 
         {/* 統計カード */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -73,7 +74,7 @@ export default function HomePage() {
                 <Image src="/assets/logo/case.png" alt="Sessions" width={48} height={48} className="object-contain" />
                 <div className="text-right">
                   <p className="text-3xl font-bold text-black">{loading ? '...' : stats.totalSessions}</p>
-                  <p className="text-sm text-gray-500">総商談数</p>
+                  <p className="text-sm text-gray-500">{t.dashboard.totalSessions}</p>
                 </div>
               </div>
             </Link>
@@ -85,7 +86,7 @@ export default function HomePage() {
                 <Image src="/assets/logo/Approval.png" alt="Approvals" width={48} height={48} className="object-contain" />
                 <div className="text-right">
                   <p className="text-3xl font-bold text-warning">{loading ? '...' : stats.pendingApprovals}</p>
-                  <p className="text-sm text-gray-500">承認待ち</p>
+                  <p className="text-sm text-gray-500">{t.dashboard.pendingApprovals}</p>
                 </div>
               </div>
             </Link>
@@ -97,7 +98,7 @@ export default function HomePage() {
                 <Image src="/assets/logo/KPI.png" alt="KPI" width={48} height={48} className="object-contain" />
                 <div className="text-right">
                   <p className="text-3xl font-bold text-success">{loading ? '...' : `${stats.winRate}%`}</p>
-                  <p className="text-sm text-gray-500">成約率</p>
+                  <p className="text-sm text-gray-500">{t.dashboard.winRate}</p>
                 </div>
               </div>
             </Link>
@@ -109,9 +110,9 @@ export default function HomePage() {
           <GlassCard hover>
             <Link href="/upload" className="block p-8 space-y-4">
               <Image src="/assets/logo/Voice.png" alt="Upload" width={64} height={64} className="object-contain" />
-              <h2 className="text-2xl font-semibold text-black">音声解析</h2>
+              <h2 className="text-2xl font-semibold text-black">{t.dashboard.uploadTitle}</h2>
               <p className="text-gray-600">
-                商談音声をアップロードして自動分析を開始
+                {t.dashboard.uploadDescription}
               </p>
             </Link>
           </GlassCard>
@@ -119,16 +120,16 @@ export default function HomePage() {
           <GlassCard>
             <div className="p-8 space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-semibold text-black">最近の商談</h2>
+                <h2 className="text-2xl font-semibold text-black">{t.dashboard.recentSessions}</h2>
                 <Link href="/sessions" className="text-gray-600 hover:text-black text-sm">
-                  すべて表示 →
+                  {t.common.viewAll} →
                 </Link>
               </div>
               <div className="space-y-3">
                 {loading ? (
-                  <p className="text-gray-500 text-sm">読み込み中...</p>
+                  <p className="text-gray-500 text-sm">{t.common.loading}</p>
                 ) : stats.recentSessions.length === 0 ? (
-                  <p className="text-gray-500 text-sm">商談データがありません</p>
+                  <p className="text-gray-500 text-sm">{t.sessions.noSessions}</p>
                 ) : (
                   stats.recentSessions.map((session) => (
                     <Link
@@ -148,7 +149,7 @@ export default function HomePage() {
                             ? 'bg-success/20 text-success' 
                             : 'bg-danger/20 text-danger'
                         }`}>
-                          {session.outcomeLabel === 'won' ? '成約' : '失注'}
+                          {session.outcomeLabel === 'won' ? t.dashboard.won : t.dashboard.lost}
                         </span>
                       )}
                     </Link>
@@ -163,9 +164,9 @@ export default function HomePage() {
         <GlassCard>
           <div className="p-8 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-semibold text-black">今月の成約推移</h2>
+              <h2 className="text-2xl font-semibold text-black">{t.dashboard.monthlyTrend}</h2>
               <Link href="/kpi" className="text-gray-600 hover:text-black text-sm">
-                詳細を表示 →
+                {t.common.showMore} →
               </Link>
             </div>
             <div className="h-48 flex items-end justify-between gap-2">
@@ -175,7 +176,7 @@ export default function HomePage() {
                     className="w-full bg-gradient-to-t from-black to-gray-600 rounded-t-lg transition-all hover:from-gray-700 hover:to-gray-400"
                     style={{ height: `${value}%` }}
                   />
-                  <span className="text-xs text-gray-500">{index + 1}週</span>
+                  <span className="text-xs text-gray-500">{index + 1}{t.dashboard.week}</span>
                 </div>
               ))}
             </div>

@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import '@/styles/globals.css';
 import { Sidebar } from '@/components/Sidebar';
+import { LanguageProvider } from '@/lib/i18n/LanguageContext';
+import { LanguageToggle } from '@/components/LanguageToggle';
 
 export const metadata: Metadata = {
   title: 'Sales Analytics - 商談音声分析',
@@ -22,12 +24,15 @@ export default function RootLayout({
   return (
     <html lang="ja" suppressHydrationWarning>
       <body className="min-h-screen bg-white text-black">
-        <div className="min-h-screen">
-          <Sidebar />
-          <main className="ml-64">
-            {children}
-          </main>
-        </div>
+        <LanguageProvider>
+          <div className="min-h-screen">
+            <Sidebar />
+            <main className="ml-64">
+              {children}
+            </main>
+            <LanguageToggle />
+          </div>
+        </LanguageProvider>
       </body>
     </html>
   );

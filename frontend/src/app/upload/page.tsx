@@ -4,8 +4,11 @@ import { useState } from 'react';
 import { GlassCard } from '@/components/glass/GlassCard';
 import { ConsentDialog } from '@/components/ConsentDialog';
 import { AudioUploadDropzone } from '@/components/AudioUploadDropzone';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { PageHeader } from '@/components/PageHeader';
 
 export default function UploadPage() {
+  const { t } = useLanguage();
   const [consentGiven, setConsentGiven] = useState(false);
   const [showConsentDialog, setShowConsentDialog] = useState(true);
 
@@ -15,22 +18,20 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="min-h-screen p-8">
+    <div className="min-h-screen p-8 bg-gray-50">
       <div className="max-w-3xl mx-auto space-y-8">
-        <header className="text-center space-y-2">
-          <h1 className="text-4xl font-bold">音声アップロード</h1>
-          <p className="text-gray-300">
-            商談音声をアップロードして自動分析を開始します
-          </p>
-        </header>
+        <PageHeader 
+          title={t.upload.title}
+          subtitle={t.upload.subtitle}
+        />
 
         <GlassCard>
           {!consentGiven ? (
             <div className="p-8 text-center space-y-4">
               <div className="text-6xl">🔒</div>
-              <h2 className="text-2xl font-semibold">同意が必要です</h2>
-              <p className="text-gray-300">
-                音声データの取り扱いについて同意いただく必要があります
+              <h2 className="text-2xl font-semibold text-black">{t.upload.title}</h2>
+              <p className="text-gray-600">
+                {t.upload.subtitle}
               </p>
             </div>
           ) : (

@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { GlassCard } from '@/components/glass/GlassCard';
 import { ApprovalQueue } from '@/components/ApprovalQueue';
 import { apiClient } from '@/app/api-proxy';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { PageHeader } from '@/components/PageHeader';
 
 interface ApprovalRequest {
   id: string;
@@ -17,6 +19,7 @@ interface ApprovalRequest {
 }
 
 export default function ApprovalsPage() {
+  const { t } = useLanguage();
   const [requests, setRequests] = useState<ApprovalRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -37,26 +40,24 @@ export default function ApprovalsPage() {
 
   if (loading) {
     return (
-      <main className="container mx-auto px-4 py-16">
-        <div className="text-center">読み込み中...</div>
-      </main>
+      <div className="min-h-screen p-8 bg-gray-50">
+        <div className="text-center text-gray-600">{t.common.loading}</div>
+      </div>
     );
   }
 
   return (
-    <div className="min-h-screen p-8">
+    <div className="min-h-screen p-8 bg-gray-50">
       <div className="max-w-7xl mx-auto space-y-8">
-        <header>
-          <h1 className="text-4xl font-bold">承認キュー</h1>
-          <p className="text-gray-300 mt-2">
-            Outcome ラベルの承認待ち一覧（同一店舗のみ）
-          </p>
-        </header>
+        <PageHeader 
+          title={t.approvals.title}
+          subtitle={t.approvals.subtitle}
+        />
 
         {requests.length === 0 ? (
           <GlassCard>
-            <div className="p-8 text-center text-gray-400">
-              承認待ちのリクエストはありません
+            <div className="p-8 text-center text-gray-600">
+              {t.approvals.noPending}
             </div>
           </GlassCard>
         ) : (

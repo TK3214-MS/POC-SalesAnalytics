@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { GlassCard } from '@/components/glass/GlassCard';
 import { DeadlinePill } from '@/components/glass/DeadlinePill';
 import { apiClient } from '@/app/api-proxy';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { PageHeader } from '@/components/PageHeader';
 
 interface Session {
   id: string;
@@ -16,6 +18,7 @@ interface Session {
 }
 
 export default function SessionsPage() {
+  const { t } = useLanguage();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -36,33 +39,33 @@ export default function SessionsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen p-8">
-        <div className="text-center">読み込み中...</div>
+      <div className="min-h-screen p-8 bg-gray-50">
+        <div className="text-center text-gray-600">{t.common.loading}</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen p-8">
+    <div className="min-h-screen p-8 bg-gray-50">
       <div className="max-w-7xl mx-auto space-y-8">
-        <header className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold">商談一覧</h1>
-            <p className="text-gray-300 mt-2">過去の商談データを閲覧</p>
-          </div>
-          <Link
-            href="/upload"
-            className="px-6 py-3 rounded-lg bg-primary-600 hover:bg-primary-700 transition-colors"
-          >
-            + 新規アップロード
-          </Link>
-        </header>
+        <PageHeader 
+          title={t.sessions.title}
+          subtitle={t.sessions.subtitle}
+          actions={
+            <Link
+              href="/upload"
+              className="px-6 py-3 rounded-lg bg-black hover:bg-gray-800 text-white transition-colors"
+            >
+              + {t.nav.upload}
+            </Link>
+          }
+        />
 
         <div className="space-y-4">
           {sessions.length === 0 ? (
             <GlassCard>
-              <div className="p-8 text-center text-gray-400">
-                商談データがありません
+              <div className="p-8 text-center text-gray-600">
+                {t.sessions.noSessions}
               </div>
             </GlassCard>
           ) : (

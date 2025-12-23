@@ -160,6 +160,16 @@ POC-SalesAnalytics/
 
 ## Key Features
 
+### 0. Multi-language Support (Japanese/English)
+Real-time language switching in frontend UI between Japanese and English:
+- **Auto Language Detection**: Automatically detects browser language on first access (Japanese for ja, English for others)
+- **Language Toggle Button**: Fixed dropdown menu at bottom-right corner (using language.png icon)
+- **Supported Languages**: Japanese, English
+- **Persistence**: Selected language is saved in local storage and maintained across sessions (local storage takes priority over auto-detection)
+- **Coverage**: All pages (Dashboard, Audio Upload, Sessions, Approvals, KPI, Navigation, Consent Dialog, etc.)
+- **Technology**: React Context API, TypeScript type-safe translation system
+- **Details**: See [docs/LANGUAGE_FEATURE.md](docs/LANGUAGE_FEATURE.md)
+
 ### 1. Consent (Required)
 Consent checkbox is mandatory in the UI before audio upload. Upload is blocked without consent.
 
