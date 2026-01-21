@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace FunctionsApp.Data;
 
-public class CosmosRepository
+public class CosmosRepository : ICosmosRepository
 {
     private readonly CosmosClient _client;
     private readonly Container _sessionsContainer;

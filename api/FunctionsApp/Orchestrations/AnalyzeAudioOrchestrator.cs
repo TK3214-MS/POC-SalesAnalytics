@@ -8,10 +8,10 @@ namespace FunctionsApp.Orchestrations;
 
 public class AnalyzeAudioOrchestrator
 {
-    private readonly CosmosRepository _cosmosRepo;
-    private readonly BlobRepository _blobRepo;
+    private readonly ICosmosRepository _cosmosRepo;
+    private readonly IBlobRepository _blobRepo;
 
-    public AnalyzeAudioOrchestrator(CosmosRepository cosmosRepo, BlobRepository blobRepo)
+    public AnalyzeAudioOrchestrator(ICosmosRepository cosmosRepo, IBlobRepository blobRepo)
     {
         _cosmosRepo = cosmosRepo;
         _blobRepo = blobRepo;
@@ -49,14 +49,16 @@ public class AnalyzeAudioOrchestrator
                 piiMasked.FullText);
 
             // 5. AI Search 索引化
+            // 簡易Sessionオブジェクトを作成
+            var tempSession = new Shared.Session
+            {
+                Id = input.SessionId,
+                PiiMasked = piiMasked,
+                Summary = summary
+            };
             await context.CallActivityAsync(
                 nameof(Activities.IndexToSearchActivity),
-                new IndexInput
-                {
-                    SessionId = input.SessionId,
-                    PiiMaskedText = piiMasked.FullText,
-                    SummaryKeyPoints = string.Join(" ", summary.KeyPoints)
-                });
+                tempSession);
 
             // 6. SharePoint にトランスクリプトをアップロード
             string? sharePointUrl = null;
@@ -115,11 +117,4 @@ public class AnalyzeAudioInput
     public string SessionId { get; set; } = default!;
     public string UserId { get; set; } = default!;
     public string BlobName { get; set; } = default!;
-}
-
-public class IndexInput
-{
-    public string SessionId { get; set; } = default!;
-    public string PiiMaskedText { get; set; } = default!;
-    public string SummaryKeyPoints { get; set; } = default!;
 }

@@ -9,9 +9,9 @@ namespace FunctionsApp.Http;
 
 public class CreateOutcomeLabelRequest
 {
-    private readonly CosmosRepository _cosmosRepo;
+    private readonly ICosmosRepository _cosmosRepo;
 
-    public CreateOutcomeLabelRequest(CosmosRepository cosmosRepo)
+    public CreateOutcomeLabelRequest(ICosmosRepository cosmosRepo)
     {
         _cosmosRepo = cosmosRepo;
     }

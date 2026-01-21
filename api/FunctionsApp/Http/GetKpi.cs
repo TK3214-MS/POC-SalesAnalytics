@@ -9,9 +9,9 @@ namespace FunctionsApp.Http;
 
 public class GetKpi
 {
-    private readonly CosmosRepository _cosmosRepo;
+    private readonly ICosmosRepository _cosmosRepo;
 
-    public GetKpi(CosmosRepository cosmosRepo)
+    public GetKpi(ICosmosRepository cosmosRepo)
     {
         _cosmosRepo = cosmosRepo;
     }

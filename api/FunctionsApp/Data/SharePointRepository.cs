@@ -7,7 +7,7 @@ using System.Text;
 
 namespace FunctionsApp.Data;
 
-public class SharePointRepository
+public class SharePointRepository : ISharePointRepository
 {
     private readonly GraphServiceClient _graphClient;
     private readonly IConfiguration _configuration;
@@ -131,6 +131,15 @@ public class SharePointRepository
             _logger.LogError($"Failed to ensure store folder {storeId}: {ex.Message}");
             throw;
         }
+    }
+
+    /// <summary>
+    /// ドキュメントをアップロード（ISharePointRepository 実装）
+    /// </summary>
+    public async Task<string> UploadDocumentAsync(string fileName, string content)
+    {
+        // デフォルトのstoreIdを使用（実際の実装では引数から取得）
+        return await UploadTranscriptAsync("default-store", fileName, content);
     }
 
     /// <summary>

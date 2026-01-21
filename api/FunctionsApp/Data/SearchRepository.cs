@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace FunctionsApp.Data;
 
-public class SearchRepository
+public class SearchRepository : ISearchRepository
 {
     private readonly SearchClient _searchClient;
     private readonly SearchIndexClient _indexClient;
@@ -24,13 +24,13 @@ public class SearchRepository
         _searchClient = _indexClient.GetSearchClient(indexName);
     }
 
-    public async Task IndexSessionAsync(string sessionId, string piiMaskedText, string summaryKeyPoints)
+    public async Task IndexSessionAsync(Shared.Session session)
     {
         var document = new SearchDocument
         {
-            ["id"] = sessionId,
-            ["piiMaskedText"] = piiMaskedText,
-            ["summaryKeyPoints"] = summaryKeyPoints,
+            ["id"] = session.Id,
+            ["piiMaskedText"] = session.PiiMasked?.FullText ?? "",
+            ["summaryKeyPoints"] = string.Join(", ", session.Summary?.KeyPoints ?? new List<string>()),
             // TODO: ベクトル埋め込み（text-embedding-ada-002 等）を追加
             // ["embedding"] = await GenerateEmbeddingAsync(piiMaskedText)
         };

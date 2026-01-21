@@ -1,0 +1,137 @@
+{
+  "id": "demo-session-002",
+  "userId": "user-demo-001",
+  "storeId": "store-tokyo-001",
+  "customerName": "佐藤花子",
+  "createdAt": "2026-01-20T14:15:00Z",
+  "consentGiven": true,
+  "status": "completed",
+  "audioUrl": "https://demo-storage.blob.core.windows.net/audio/demo-session-002.wav",
+  "transcription": {
+    "speakers": [
+      {
+        "id": "spk-0",
+        "segments": [
+          {
+            "id": "seg-0-0",
+            "text": "いらっしゃいませ。本日はいかがなさいましたか？",
+            "start": 0.5,
+            "end": 3.0
+          },
+          {
+            "id": "seg-0-1",
+            "text": "コンパクトカーでしたら、こちらのモデルがお勧めです。燃費も良く、市街地での運転も楽です。",
+            "start": 8.0,
+            "end": 15.5
+          },
+          {
+            "id": "seg-0-2",
+            "text": "こちらのモデルは250万円からございます。",
+            "start": 18.0,
+            "end": 22.0
+          },
+          {
+            "id": "seg-0-3",
+            "text": "かしこまりました。カタログをお持ちしますので、ゆっくりご検討ください。",
+            "start": 28.0,
+            "end": 33.5
+          }
+        ]
+      },
+      {
+        "id": "spk-1",
+        "segments": [
+          {
+            "id": "seg-1-0",
+            "text": "通勤用に小さめの車を探しています。",
+            "start": 3.5,
+            "end": 6.5
+          },
+          {
+            "id": "seg-1-1",
+            "text": "いいですね。価格はどのくらいですか？",
+            "start": 15.8,
+            "end": 18.5
+          },
+          {
+            "id": "seg-1-2",
+            "text": "少し予算オーバーかもしれません。一度検討してみます。",
+            "start": 22.5,
+            "end": 27.5
+          },
+          {
+            "id": "seg-1-3",
+            "text": "ありがとうございました。",
+            "start": 34.0,
+            "end": 36.0
+          }
+        ]
+      }
+    ]
+  },
+  "piiMasked": {
+    "fullText": "いらっしゃいませ。本日はいかがなさいましたか？\n通勤用に小さめの車を探しています。\nコンパクトカーでしたら、こちらのモデルがお勧めです。燃費も良く、市街地での運転も楽です。\nいいですね。価格はどのくらいですか？\nこちらのモデルは250万円からございます。\n少し予算オーバーかもしれません。一度検討してみます。\nかしこまりました。カタログをお持ちしますので、ゆっくりご検討ください。\nありがとうございました。",
+    "entities": []
+  },
+  "sentiment": {
+    "overall": "neutral",
+    "segments": [
+      {
+        "text": "いらっしゃいませ。本日はいかがなさいましたか？",
+        "sentiment": "positive",
+        "confidence": 0.90
+      },
+      {
+        "text": "少し予算オーバーかもしれません。",
+        "sentiment": "negative",
+        "confidence": 0.85
+      }
+    ]
+  },
+  "summary": {
+    "keyPoints": [
+      "顧客は通勤用のコンパクトカーを探している",
+      "提案車両の価格は250万円から",
+      "顧客は予算オーバーを懸念"
+    ],
+    "concerns": [
+      "予算が合わない可能性",
+      "即決には至らず"
+    ],
+    "nextActions": [
+      "カタログを渡して検討を促す",
+      "フォローアップの連絡を検討"
+    ],
+    "successFactors": [
+      "顧客のニーズ（通勤用）をヒアリングできた",
+      "適切な車種を提案できた"
+    ],
+    "improvementAreas": [
+      "予算をもっと早く確認すべきだった",
+      "予算に合う他の選択肢も提示すべきだった"
+    ],
+    "quotations": [
+      {
+        "speakerSegmentId": "seg-1-0",
+        "timeRange": "3.5-6.5",
+        "text": "通勤用に小さめの車を探しています。"
+      },
+      {
+        "speakerSegmentId": "seg-1-2",
+        "timeRange": "22.5-27.5",
+        "text": "少し予算オーバーかもしれません。一度検討してみます。"
+      }
+    ]
+  },
+  "outcomeLabel": "pending",
+  "outcomeLabelRequest": {
+    "id": "req-002",
+    "requestedBy": "user-demo-001",
+    "requestedAt": "2026-01-20T16:00:00Z",
+    "outcome": "pending",
+    "reason": "顧客は検討中。フォローアップが必要。",
+    "status": "pending"
+  },
+  "sharePointUrl": "https://demo-sharepoint.sharepoint.com/sites/SalesAnalytics/store-tokyo-001/transcript_20260120_demo-session-002.md",
+  "ttl": 2592000
+}

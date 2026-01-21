@@ -10,10 +10,10 @@ namespace FunctionsApp.Http;
 
 public class UploadAudio
 {
-    private readonly CosmosRepository _cosmosRepo;
-    private readonly BlobRepository _blobRepo;
+    private readonly ICosmosRepository _cosmosRepo;
+    private readonly IBlobRepository _blobRepo;
 
-    public UploadAudio(CosmosRepository cosmosRepo, BlobRepository blobRepo)
+    public UploadAudio(ICosmosRepository cosmosRepo, IBlobRepository blobRepo)
     {
         _cosmosRepo = cosmosRepo;
         _blobRepo = blobRepo;

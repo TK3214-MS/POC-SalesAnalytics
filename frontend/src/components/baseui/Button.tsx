@@ -15,9 +15,9 @@ export function Button({
 
   const variantStyles = {
     primary:
-      'bg-white hover:bg-gray-100 text-black focus:ring-gray-500 shadow-lg hover:shadow-xl border border-gray-200',
+      'bg-emerald-500 hover:bg-emerald-600 text-white focus:ring-emerald-500 shadow-lg hover:shadow-xl',
     secondary:
-      'bg-white/10 hover:bg-white/20 border border-white/30 text-white focus:ring-white/50 backdrop-blur-sm',
+      'bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-900 focus:ring-gray-500 shadow-md hover:shadow-lg',
     danger:
       'bg-danger hover:bg-red-600 text-white focus:ring-danger shadow-lg hover:shadow-xl',
   };

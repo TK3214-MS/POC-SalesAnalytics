@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace FunctionsApp.AI;
 
-public class LanguageClient
+public class LanguageClient : ILanguageClient
 {
     private readonly TextAnalyticsClient _client;
 

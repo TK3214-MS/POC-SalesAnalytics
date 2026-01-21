@@ -25,6 +25,7 @@ export default function KpiPage() {
     const fetchKpi = async () => {
       try {
         const data = await apiClient.get('/GetKpi');
+        console.log('KPI data received:', data);
         setKpiData(data.stores || []);
       } catch (error) {
         console.error('Failed to fetch KPI:', error);
@@ -43,6 +44,8 @@ export default function KpiPage() {
       </div>
     );
   }
+
+  console.log('Rendering KPI page with data:', kpiData);
 
   return (
     <div className="min-h-screen p-8 bg-gray-50">

@@ -9,9 +9,9 @@ namespace FunctionsApp.Http;
 
 public class ApproveOutcomeLabelRequest
 {
-    private readonly CosmosRepository _cosmosRepo;
+    private readonly ICosmosRepository _cosmosRepo;
 
-    public ApproveOutcomeLabelRequest(CosmosRepository cosmosRepo)
+    public ApproveOutcomeLabelRequest(ICosmosRepository cosmosRepo)
     {
         _cosmosRepo = cosmosRepo;
     }

@@ -7,10 +7,10 @@ namespace FunctionsApp.Activities;
 
 public class UploadToSharePointActivity
 {
-    private readonly SharePointRepository _sharePointRepo;
-    private readonly CosmosRepository _cosmosRepo;
+    private readonly ISharePointRepository _sharePointRepo;
+    private readonly ICosmosRepository _cosmosRepo;
 
-    public UploadToSharePointActivity(SharePointRepository sharePointRepo, CosmosRepository cosmosRepo)
+    public UploadToSharePointActivity(ISharePointRepository sharePointRepo, ICosmosRepository cosmosRepo)
     {
         _sharePointRepo = sharePointRepo;
         _cosmosRepo = cosmosRepo;

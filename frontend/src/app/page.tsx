@@ -29,25 +29,68 @@ export default function HomePage() {
     recentSessions: [],
   });
   const [loading, setLoading] = useState(true);
+  const [weeklyTrend, setWeeklyTrend] = useState<number[]>([]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        // TODO: 実際のAPIエンドポイントに置き換え
-        // const data = await apiClient.get('/GetDashboardStats');
-        // setStats(data);
+        // セッション一覧を取得
+        const sessionsData = await apiClient.get('/ListMySessions');
+        const sessions = sessionsData.sessions || [];
         
-        // デモデータ
+        // 承認キューを取得
+        const approvalData = await apiClient.get('/ListApprovalQueue');
+        const approvals = approvalData.requests || [];
+        
+        // 統計を計算
+        const wonCount = sessions.filter((s: any) => s.outcomeLabel === 'won').length;
+        const totalWithLabel = sessions.filter((s: any) => s.outcomeLabel && s.outcomeLabel !== 'pending').length;
+        const winRate = totalWithLabel > 0 ? (wonCount / totalWithLabel) * 100 : 0;
+        
+        // 最近のセッション（最新5件）
+        const recentSessions = sessions
+          .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          .slice(0, 5);
+        
+        // 週別の成約率を計算（過去7週間）
+        const now = new Date();
+        const weeklyRates: number[] = [];
+        
+        for (let i = 6; i >= 0; i--) {
+          const weekStart = new Date(now);
+          weekStart.setDate(now.getDate() - (i * 7));
+          weekStart.setHours(0, 0, 0, 0);
+          
+          const weekEnd = new Date(weekStart);
+          weekEnd.setDate(weekStart.getDate() + 7);
+          
+          // この週のセッションをフィルタ
+          const weekSessions = sessions.filter((s: any) => {
+            const sessionDate = new Date(s.createdAt);
+            return sessionDate >= weekStart && sessionDate < weekEnd;
+          });
+          
+          // 成約率を計算
+          const wonCount = weekSessions.filter((s: any) => s.outcomeLabel === 'won').length;
+          const totalWithLabel = weekSessions.filter((s: any) => 
+            s.outcomeLabel && s.outcomeLabel !== 'pending'
+          ).length;
+          const weekWinRate = totalWithLabel > 0 ? Math.round((wonCount / totalWithLabel) * 100) : 0;
+          
+          weeklyRates.push(weekWinRate);
+        }
+        
+        console.log('Weekly trend data:', weeklyRates);
+        setWeeklyTrend(weeklyRates);
+        
         setStats({
-          totalSessions: 127,
-          pendingApprovals: 8,
-          winRate: 68.5,
-          recentSessions: [
-            { id: '1', customerName: '田中様', createdAt: new Date().toISOString(), outcomeLabel: 'won' },
-            { id: '2', customerName: '佐藤様', createdAt: new Date().toISOString(), outcomeLabel: null },
-            { id: '3', customerName: '鈴木様', createdAt: new Date().toISOString(), outcomeLabel: 'lost' },
-          ],
+          totalSessions: sessions.length,
+          pendingApprovals: approvals.length,
+          winRate: Math.round(winRate * 10) / 10,
+          recentSessions,
         });
+        
+        setMonthlyData(weeklyTrend);
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error);
       } finally {
@@ -170,11 +213,12 @@ export default function HomePage() {
               </Link>
             </div>
             <div className="h-48 flex items-end justify-between gap-2">
-              {[65, 72, 58, 80, 75, 68, 82].map((value, index) => (
+              {(weeklyTrend.length > 0 ? weeklyTrend : [0, 0, 0, 0, 0, 0, 0]).map((value, index) => (
                 <div key={index} className="flex-1 flex flex-col items-center gap-2">
                   <div 
                     className="w-full bg-gradient-to-t from-black to-gray-600 rounded-t-lg transition-all hover:from-gray-700 hover:to-gray-400"
-                    style={{ height: `${value}%` }}
+                    style={{ height: `${Math.max(value, 5)}%` }}
+                    title={`成約率: ${value}%`}
                   />
                   <span className="text-xs text-gray-500">{index + 1}{t.dashboard.week}</span>
                 </div>

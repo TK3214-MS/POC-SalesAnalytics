@@ -103,7 +103,7 @@ export default function SessionDetailPage() {
         {/* 文字起こし */}
         <GlassCard>
           <div className="p-6 space-y-4">
-            <h2 className="text-2xl font-semibold">文字起こし</h2>
+            <h2 className="text-2xl font-semibold text-black">文字起こし</h2>
             <SpeakerTimeline speakers={session.transcription.speakers} />
           </div>
         </GlassCard>
@@ -111,11 +111,11 @@ export default function SessionDetailPage() {
         {/* 要約 */}
         <GlassCard>
           <div className="p-6 space-y-6">
-            <h2 className="text-2xl font-semibold">AI 要約</h2>
+            <h2 className="text-2xl font-semibold text-black">AI 要約</h2>
 
             <div>
-              <h3 className="text-lg font-semibold text-primary-400 mb-2">要点</h3>
-              <ul className="list-disc list-inside space-y-1 text-gray-300">
+              <h3 className="text-lg font-semibold text-primary-600 mb-2">要点</h3>
+              <ul className="list-disc list-inside space-y-1 text-gray-700">
                 {session.summary.keyPoints.map((point, i) => (
                   <li key={i}>{point}</li>
                 ))}
@@ -124,7 +124,7 @@ export default function SessionDetailPage() {
 
             <div>
               <h3 className="text-lg font-semibold text-warning mb-2">顧客懸念</h3>
-              <ul className="list-disc list-inside space-y-1 text-gray-300">
+              <ul className="list-disc list-inside space-y-1 text-gray-700">
                 {session.summary.concerns.map((concern, i) => (
                   <li key={i}>{concern}</li>
                 ))}
@@ -133,7 +133,7 @@ export default function SessionDetailPage() {
 
             <div>
               <h3 className="text-lg font-semibold text-success mb-2">次アクション</h3>
-              <ul className="list-disc list-inside space-y-1 text-gray-300">
+              <ul className="list-disc list-inside space-y-1 text-gray-700">
                 {session.summary.nextActions.map((action, i) => (
                   <li key={i}>{action}</li>
                 ))}
@@ -141,12 +141,12 @@ export default function SessionDetailPage() {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-primary-400 mb-2">引用</h3>
+              <h3 className="text-lg font-semibold text-primary-600 mb-2">引用</h3>
               <div className="space-y-2">
                 {session.summary.quotations.map((quote, i) => (
-                  <div key={i} className="p-3 rounded bg-white/5 border border-white/10">
-                    <p className="text-sm text-gray-400 mb-1">{quote.timeRange}</p>
-                    <p className="italic">"{quote.text}"</p>
+                  <div key={i} className="p-3 rounded bg-primary-50 border border-primary-200">
+                    <p className="text-sm text-gray-600 mb-1">{quote.timeRange}</p>
+                    <p className="italic text-gray-800">"{quote.text}"</p>
                   </div>
                 ))}
               </div>

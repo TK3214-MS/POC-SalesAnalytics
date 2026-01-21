@@ -6,6 +6,38 @@
 
 Auto-Transcription and Analysis System for Automobile Dealer Sales Conversations (MVP)
 
+## 🎭 Demo Mode Feature
+
+**End-to-end demo without Azure connection!**
+
+### Demo Mode Features
+- ✅ No Azure connection required (runs entirely locally)
+- ✅ Experience all features with mock data
+- ✅ Switch between production/demo mode from UI instantly
+- ✅ Production code remains intact (not deleted)
+
+### How to Use
+
+**1. Backend (Demo Mode)**
+```bash
+cd api/FunctionsApp
+# Set DEMO_MODE to true in local.settings.json
+# No Azure connection info needed
+func start
+```
+
+**2. Frontend**
+```bash
+cd frontend
+pnpm install
+pnpm dev
+```
+
+**3. Mode Toggle in UI**
+- Toggle switch at the bottom of the left sidebar
+- 🎭 Demo Mode: Runs with mock data
+- ☁️ Production Mode: Connects to Azure services
+
 ## Overview
 
 Upload sales conversation audio (face-to-face recordings in Japanese) for automatic processing:

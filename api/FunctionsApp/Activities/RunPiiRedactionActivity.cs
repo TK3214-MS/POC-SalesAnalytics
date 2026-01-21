@@ -6,9 +6,9 @@ namespace FunctionsApp.Activities;
 
 public class RunPiiRedactionActivity
 {
-    private readonly LanguageClient _languageClient;
+    private readonly ILanguageClient _languageClient;
 
-    public RunPiiRedactionActivity(LanguageClient languageClient)
+    public RunPiiRedactionActivity(ILanguageClient languageClient)
     {
         _languageClient = languageClient;
     }

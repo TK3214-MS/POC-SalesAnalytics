@@ -6,9 +6,9 @@ namespace FunctionsApp.Activities;
 
 public class RunSentimentActivity
 {
-    private readonly LanguageClient _languageClient;
+    private readonly ILanguageClient _languageClient;
 
-    public RunSentimentActivity(LanguageClient languageClient)
+    public RunSentimentActivity(ILanguageClient languageClient)
     {
         _languageClient = languageClient;
     }

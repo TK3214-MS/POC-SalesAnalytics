@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { DemoModeToggle } from '@/lib/demo-mode';
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -62,7 +63,10 @@ export function Sidebar() {
       </nav>
 
       {/* User Info */}
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 border-t border-gray-200 space-y-3">
+        {/* Demo Mode Toggle */}
+        <DemoModeToggle />
+        
         <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-gray-50">
           <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center text-sm font-bold text-white">
             D

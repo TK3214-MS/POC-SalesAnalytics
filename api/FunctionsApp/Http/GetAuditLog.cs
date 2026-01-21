@@ -9,9 +9,9 @@ namespace FunctionsApp.Http;
 
 public class GetAuditLog
 {
-    private readonly CosmosRepository _cosmosRepo;
+    private readonly ICosmosRepository _cosmosRepo;
 
-    public GetAuditLog(CosmosRepository cosmosRepo)
+    public GetAuditLog(ICosmosRepository cosmosRepo)
     {
         _cosmosRepo = cosmosRepo;
     }

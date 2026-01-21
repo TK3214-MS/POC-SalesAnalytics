@@ -9,9 +9,9 @@ namespace FunctionsApp.Http;
 
 public class GetSession
 {
-    private readonly CosmosRepository _cosmosRepo;
+    private readonly ICosmosRepository _cosmosRepo;
 
-    public GetSession(CosmosRepository cosmosRepo)
+    public GetSession(ICosmosRepository cosmosRepo)
     {
         _cosmosRepo = cosmosRepo;
     }

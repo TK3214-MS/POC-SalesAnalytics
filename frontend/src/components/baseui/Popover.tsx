@@ -1,22 +1,20 @@
 'use client';
 
-import * as BasePopover from '@base-ui/react/popover';
+import { ReactNode } from 'react';
 
 interface PopoverProps {
-  trigger: React.ReactNode;
-  children: React.ReactNode;
+  trigger: ReactNode;
+  children: ReactNode;
 }
 
+// Simplified Popover without Base UI
 export function Popover({ trigger, children }: PopoverProps) {
   return (
-    <BasePopover.Root>
-      <BasePopover.Trigger asChild>{trigger}</BasePopover.Trigger>
-      <BasePopover.Portal>
-        <BasePopover.Popup className="z-50 rounded-xl backdrop-blur-xl bg-slate-900/90 border border-white/20 shadow-2xl p-4 animate-fade-in">
-          {children}
-          <BasePopover.Arrow className="fill-slate-900/90" />
-        </BasePopover.Popup>
-      </BasePopover.Portal>
-    </BasePopover.Root>
+    <div className="relative group inline-block">
+      {trigger}
+      <div className="absolute z-50 hidden group-hover:block mt-2 rounded-xl backdrop-blur-xl bg-slate-900/90 border border-white/20 shadow-2xl p-4">
+        {children}
+      </div>
+    </div>
   );
 }

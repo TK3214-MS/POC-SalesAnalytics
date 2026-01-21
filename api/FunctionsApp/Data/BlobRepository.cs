@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace FunctionsApp.Data;
 
-public class BlobRepository
+public class BlobRepository : IBlobRepository
 {
     private readonly BlobContainerClient _containerClient;
 
@@ -19,10 +19,10 @@ public class BlobRepository
         _containerClient.CreateIfNotExists();
     }
 
-    public async Task<string> UploadAudioAsync(string blobName, Stream audioStream)
+    public async Task<string> UploadAudioAsync(Stream stream, string fileName)
     {
-        var blobClient = _containerClient.GetBlobClient(blobName);
-        await blobClient.UploadAsync(audioStream, overwrite: true);
+        var blobClient = _containerClient.GetBlobClient(fileName);
+        await blobClient.UploadAsync(stream, overwrite: true);
         return blobClient.Uri.ToString();
     }
 

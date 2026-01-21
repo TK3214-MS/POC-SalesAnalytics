@@ -7,10 +7,10 @@ namespace FunctionsApp.Activities;
 
 public class RunTranscriptionActivity
 {
-    private readonly SpeechClient _speechClient;
-    private readonly BlobRepository _blobRepo;
+    private readonly ISpeechClient _speechClient;
+    private readonly IBlobRepository _blobRepo;
 
-    public RunTranscriptionActivity(SpeechClient speechClient, BlobRepository blobRepo)
+    public RunTranscriptionActivity(ISpeechClient speechClient, IBlobRepository blobRepo)
     {
         _speechClient = speechClient;
         _blobRepo = blobRepo;

@@ -5,10 +5,11 @@ const nextConfig = {
   compress: true,
   
   async rewrites() {
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:7071';
     return [
       {
         source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_BASE_URL}/:path*`,
+        destination: `${apiBaseUrl}/:path*`,
       },
     ];
   },

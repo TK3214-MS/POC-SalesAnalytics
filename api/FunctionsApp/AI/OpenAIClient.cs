@@ -7,7 +7,7 @@ using System.Text.Json;
 
 namespace FunctionsApp.AI;
 
-public class OpenAIClient
+public class OpenAIClient : IOpenAIClient
 {
     private readonly AzureOpenAIClient _client;
     private readonly string _deploymentName;

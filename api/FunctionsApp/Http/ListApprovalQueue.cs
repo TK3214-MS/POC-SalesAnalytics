@@ -9,9 +9,9 @@ namespace FunctionsApp.Http;
 
 public class ListApprovalQueue
 {
-    private readonly CosmosRepository _cosmosRepo;
+    private readonly ICosmosRepository _cosmosRepo;
 
-    public ListApprovalQueue(CosmosRepository cosmosRepo)
+    public ListApprovalQueue(ICosmosRepository cosmosRepo)
     {
         _cosmosRepo = cosmosRepo;
     }

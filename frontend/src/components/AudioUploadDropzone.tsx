@@ -1,14 +1,24 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { GlassCard } from '@/components/glass/GlassCard';
 import { Button } from '@/components/baseui/Button';
 import { apiClient } from '@/app/api-proxy';
 
+// デモモードチェック
+function isDemoMode(): boolean {
+  if (typeof window === 'undefined') return false;
+  return localStorage.getItem('appMode') === 'demo';
+}
+
 export function AudioUploadDropzone() {
+  const router = useRouter();
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [textMode, setTextMode] = useState(false);
+  const [textContent, setTextContent] = useState('');
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -24,8 +34,13 @@ export function AudioUploadDropzone() {
     setDragging(false);
 
     const droppedFile = e.dataTransfer.files[0];
-    if (droppedFile && droppedFile.type.startsWith('audio/')) {
+    if (droppedFile && (droppedFile.type.startsWith('audio/') || droppedFile.type === 'text/plain' || droppedFile.name.endsWith('.txt'))) {
       setFile(droppedFile);
+      if (droppedFile.type === 'text/plain' || droppedFile.name.endsWith('.txt')) {
+        setTextMode(true);
+      } else {
+        setTextMode(false);
+      }
     }
   }, []);
 
@@ -33,21 +48,64 @@ export function AudioUploadDropzone() {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       setFile(selectedFile);
+      if (selectedFile.type === 'text/plain' || selectedFile.name.endsWith('.txt')) {
+        setTextMode(true);
+      } else {
+        setTextMode(false);
+      }
     }
   }, []);
 
   const handleUpload = async () => {
-    if (!file) return;
+    if (textMode && !textContent.trim() && !file) {
+      alert('テキストを入力またはファイルを選択してください');
+      return;
+    }
+    if (!textMode && !file) {
+      alert('ファイルを選択してください');
+      return;
+    }
 
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append('audio', file);
-      formData.append('consentGiven', 'true');
+      let response;
+      if (textMode) {
+        // テキストモードの場合
+        let textToUpload = textContent;
+        
+        // ファイルが選択されている場合はファイルから読み込み
+        if (file) {
+          textToUpload = await file.text();
+        }
+        
+        response = await apiClient.post('/UploadAudio', {
+          text: textToUpload,
+          consentGiven: 'true',
+        });
+        
+        alert('テキストアップロード成功！分析を開始しました。');
+        setTextContent('');
+        setFile(null);
+        
+        // セッション詳細ページにリダイレクト
+        if (response && response.sessionId) {
+          router.push(`/sessions/${response.sessionId}`);
+        }
+      } else {
+        // 音声ファイルモードの場合
+        const formData = new FormData();
+        formData.append('audio', file!);
+        formData.append('consentGiven', 'true');
 
-      await apiClient.post('/UploadAudio', formData);
-      alert('アップロード成功！分析を開始しました。');
-      setFile(null);
+        response = await apiClient.post('/UploadAudio', formData);
+        alert('アップロード成功！分析を開始しました。');
+        setFile(null);
+        
+        // セッション詳細ページにリダイレクト
+        if (response && response.sessionId) {
+          router.push(`/sessions/${response.sessionId}`);
+        }
+      }
     } catch (error) {
       console.error('Upload failed:', error);
       alert('アップロードに失敗しました');
@@ -56,58 +114,187 @@ export function AudioUploadDropzone() {
     }
   };
 
+  const demoMode = isDemoMode();
+
   return (
     <GlassCard>
       <div className="p-8">
-        <div
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          className={`border-2 border-dashed rounded-xl p-12 text-center transition-all ${
-            dragging
-              ? 'border-primary-500 bg-primary-500/10'
-              : 'border-white/30 hover:border-white/50'
-          }`}
-        >
-          {file ? (
-            <div className="space-y-4">
-              <div className="text-4xl">🎵</div>
-              <p className="text-lg font-semibold text-black">{file.name}</p>
-              <p className="text-sm text-gray-600">
-                {(file.size / 1024 / 1024).toFixed(2)} MB
-              </p>
-              <div className="flex gap-4 justify-center">
-                <Button variant="secondary" onClick={() => setFile(null)}>
-                  キャンセル
-                </Button>
-                <Button
-                  variant="primary"
-                  onClick={handleUpload}
-                  disabled={uploading}
-                >
-                  {uploading ? 'アップロード中...' : 'アップロード'}
-                </Button>
+        {demoMode && (
+          <div className="mb-6 flex gap-4 justify-center">
+            <Button
+              variant={!textMode ? 'primary' : 'secondary'}
+              onClick={() => {
+                setTextMode(false);
+                setTextContent('');
+              }}
+            >
+              🎵 音声ファイル
+            </Button>
+            <Button
+              variant={textMode ? 'primary' : 'secondary'}
+              onClick={() => {
+                setTextMode(true);
+                setFile(null);
+              }}
+            >
+              📝 テキスト
+            </Button>
+          </div>
+        )}
+
+        {textMode ? (
+          <div className="space-y-6">
+            {file ? (
+              <div className="space-y-4">
+                <div className="text-center mb-6">
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-success to-green-600 mb-4">
+                    <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <p className="text-2xl font-bold text-black">{file.name}</p>
+                  <p className="text-sm text-gray-600 mt-2">
+                    {(file.size / 1024).toFixed(2)} KB
+                  </p>
+                </div>
+                <div className="flex gap-4 justify-center">
+                  <Button variant="secondary" onClick={() => setFile(null)}>
+                    キャンセル
+                  </Button>
+                  <Button
+                    variant="primary"
+                    onClick={handleUpload}
+                    disabled={uploading}
+                  >
+                    {uploading ? 'アップロード中...' : 'アップロード'}
+                  </Button>
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="text-6xl">🎤</div>
-              <p className="text-xl text-black">音声ファイルをドロップ</p>
-              <p className="text-sm text-gray-600">または</p>
-              <label className="inline-block">
-                <input
-                  type="file"
-                  accept="audio/*"
-                  onChange={handleFileSelect}
-                  className="hidden"
+            ) : (
+              <>
+                <div className="text-center mb-6">
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 mb-4">
+                    <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </div>
+                  <p className="text-2xl font-bold text-black">文字起こしテキストをアップロード</p>
+                  <p className="text-sm text-gray-600 mt-2">
+                    デモモード: .txtファイルまたは直接入力
+                  </p>
+                </div>
+                <div
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  className={`border-2 border-dashed rounded-xl p-8 text-center transition-all mb-4 ${
+                    dragging
+                      ? 'border-primary-500 bg-primary-500/10'
+                      : 'border-white/30 hover:border-white/50'
+                  }`}
+                >
+                  <label className="cursor-pointer block">
+                    <input
+                      type="file"
+                      accept=".txt,text/plain"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                    />
+                    <div className="space-y-3">
+                      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-gray-400 to-gray-500">
+                        <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                      </div>
+                      <p className="text-lg font-semibold text-black">テキストファイルをドロップ</p>
+                      <p className="text-sm text-gray-600">または</p>
+                      <Button variant="primary" as="span">
+                        ファイルを選択
+                      </Button>
+                    </div>
+                  </label>
+                </div>
+                <div className="text-center text-sm text-gray-600 mb-3">または直接入力</div>
+                <textarea
+                  value={textContent}
+                  onChange={(e) => setTextContent(e.target.value)}
+                  className="w-full h-48 p-4 rounded-lg border-2 border-white/30 bg-white/10 text-gray-900 placeholder-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
+                  placeholder="営業: いらっしゃいませ。本日はどのようなお車をお探しでしょうか？&#10;顧客: 家族向けのSUVを探しています。&#10;営業: ご家族構成はどのような感じでしょうか？&#10;..."
                 />
-                <Button variant="primary" as="span">
-                  ファイルを選択
-                </Button>
-              </label>
-            </div>
-          )}
-        </div>
+                <div className="flex gap-4 justify-center">
+                  <Button variant="secondary" onClick={() => setTextContent('')}>
+                    クリア
+                  </Button>
+                  <Button
+                    variant="primary"
+                    onClick={handleUpload}
+                    disabled={uploading || !textContent.trim()}
+                  >
+                    {uploading ? 'アップロード中...' : 'テキストをアップロード'}
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+        ) : (
+          <div
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={`border-2 border-dashed rounded-xl p-12 text-center transition-all ${
+              dragging
+                ? 'border-primary-500 bg-primary-500/10'
+                : 'border-white/30 hover:border-white/50'
+            }`}
+          >
+            {file ? (
+              <div className="space-y-4">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-success to-green-600 mb-2">
+                  <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                  </svg>
+                </div>
+                <p className="text-lg font-semibold text-black">{file.name}</p>
+                <p className="text-sm text-gray-600">
+                  {(file.size / 1024 / 1024).toFixed(2)} MB
+                </p>
+                <div className="flex gap-4 justify-center">
+                  <Button variant="secondary" onClick={() => setFile(null)}>
+                    キャンセル
+                  </Button>
+                  <Button
+                    variant="primary"
+                    onClick={handleUpload}
+                    disabled={uploading}
+                  >
+                    {uploading ? 'アップロード中...' : 'アップロード'}
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 mb-2">
+                  <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                  </svg>
+                </div>
+                <p className="text-2xl font-bold text-black">音声ファイルをドロップ</p>
+                <p className="text-sm text-gray-600">または</p>
+                <label className="inline-block">
+                  <input
+                    type="file"
+                    accept="audio/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
+                  <Button variant="primary" as="span">
+                    ファイルを選択
+                  </Button>
+                </label>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </GlassCard>
   );

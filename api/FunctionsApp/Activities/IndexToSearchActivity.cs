@@ -6,26 +6,23 @@ namespace FunctionsApp.Activities;
 
 public class IndexToSearchActivity
 {
-    private readonly SearchRepository _searchRepo;
+    private readonly ISearchRepository _searchRepo;
 
-    public IndexToSearchActivity(SearchRepository searchRepo)
+    public IndexToSearchActivity(ISearchRepository searchRepo)
     {
         _searchRepo = searchRepo;
     }
 
     [Function(nameof(IndexToSearchActivity))]
     public async Task Run(
-        [ActivityTrigger] Orchestrations.IndexInput input,
+        [ActivityTrigger] Shared.Session session,
         FunctionContext context)
     {
         var logger = context.GetLogger(nameof(IndexToSearchActivity));
-        logger.LogInformation($"Indexing session {input.SessionId} to AI Search");
+        logger.LogInformation($"Indexing session {session.Id} to AI Search");
 
-        await _searchRepo.IndexSessionAsync(
-            input.SessionId,
-            input.PiiMaskedText,
-            input.SummaryKeyPoints);
+        await _searchRepo.IndexSessionAsync(session);
 
-        logger.LogInformation($"Indexing completed for session {input.SessionId}");
+        logger.LogInformation($"Indexing completed for session {session.Id}");
     }
 }

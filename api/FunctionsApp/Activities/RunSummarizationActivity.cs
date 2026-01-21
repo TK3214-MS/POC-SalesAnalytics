@@ -6,9 +6,9 @@ namespace FunctionsApp.Activities;
 
 public class RunSummarizationActivity
 {
-    private readonly OpenAIClient _openAIClient;
+    private readonly IOpenAIClient _openAIClient;
 
-    public RunSummarizationActivity(OpenAIClient openAIClient)
+    public RunSummarizationActivity(IOpenAIClient openAIClient)
     {
         _openAIClient = openAIClient;
     }

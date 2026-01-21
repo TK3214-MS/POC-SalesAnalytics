@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace FunctionsApp.AI;
 
-public class SpeechClient
+public class SpeechClient : ISpeechClient
 {
     private readonly string _endpoint;
     private readonly string _key;
