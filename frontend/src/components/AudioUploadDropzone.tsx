@@ -6,6 +6,30 @@ import { GlassCard } from '@/components/glass/GlassCard';
 import { Button } from '@/components/baseui/Button';
 import { apiClient } from '@/app/api-proxy';
 
+type ProcessingStage = 
+  | 'uploading'
+  | 'transcribing'
+  | 'analyzing-sentiment'
+  | 'generating-summary'
+  | 'completing'
+  | null;
+
+const stageLabels: Record<Exclude<ProcessingStage, null>, string> = {
+  uploading: 'ファイルを読み込んでいます...',
+  transcribing: '音声を文字起こししています...',
+  'analyzing-sentiment': '感情分析を実行しています...',
+  'generating-summary': '要約を生成しています...',
+  completing: '処理を完了しています...',
+};
+
+const stageProgress: Record<Exclude<ProcessingStage, null>, number> = {
+  uploading: 20,
+  transcribing: 40,
+  'analyzing-sentiment': 60,
+  'generating-summary': 80,
+  completing: 95,
+};
+
 // デモモードチェック
 function isDemoMode(): boolean {
   if (typeof window === 'undefined') return false;
@@ -19,6 +43,7 @@ export function AudioUploadDropzone() {
   const [file, setFile] = useState<File | null>(null);
   const [textMode, setTextMode] = useState(false);
   const [textContent, setTextContent] = useState('');
+  const [processingStage, setProcessingStage] = useState<ProcessingStage>(null);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -56,6 +81,13 @@ export function AudioUploadDropzone() {
     }
   }, []);
 
+  const simulateProcessing = async (stages: ProcessingStage[], delays: number[]) => {
+    for (let i = 0; i < stages.length; i++) {
+      setProcessingStage(stages[i]);
+      await new Promise(resolve => setTimeout(resolve, delays[i]));
+    }
+  };
+
   const handleUpload = async () => {
     if (textMode && !textContent.trim() && !file) {
       alert('テキストを入力またはファイルを選択してください');
@@ -75,17 +107,31 @@ export function AudioUploadDropzone() {
         
         // ファイルが選択されている場合はファイルから読み込み
         if (file) {
+          setProcessingStage('uploading');
+          await new Promise(resolve => setTimeout(resolve, 800));
           textToUpload = await file.text();
+        } else {
+          // 直接入力の場合もuploadingステージから開始
+          setProcessingStage('uploading');
+          await new Promise(resolve => setTimeout(resolve, 600));
         }
+        
+        // リアルな処理アニメーション
+        await simulateProcessing(
+          ['transcribing', 'analyzing-sentiment', 'generating-summary', 'completing'],
+          [1500, 1800, 2000, 1200]
+        );
         
         response = await apiClient.post('/UploadAudio', {
           text: textToUpload,
           consentGiven: 'true',
         });
         
-        alert('テキストアップロード成功！分析を開始しました。');
         setTextContent('');
         setFile(null);
+        
+        // 完了後、少し待ってからリダイレクト
+        await new Promise(resolve => setTimeout(resolve, 500));
         
         // セッション詳細ページにリダイレクト
         if (response && response.sessionId) {
@@ -93,13 +139,24 @@ export function AudioUploadDropzone() {
         }
       } else {
         // 音声ファイルモードの場合
+        setProcessingStage('uploading');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
         const formData = new FormData();
         formData.append('audio', file!);
         formData.append('consentGiven', 'true');
 
+        // リアルな処理アニメーション
+        await simulateProcessing(
+          ['transcribing', 'analyzing-sentiment', 'generating-summary', 'completing'],
+          [2000, 2200, 2500, 1300]
+        );
+
         response = await apiClient.post('/UploadAudio', formData);
-        alert('アップロード成功！分析を開始しました。');
         setFile(null);
+        
+        // 完了後、少し待ってからリダイレクト
+        await new Promise(resolve => setTimeout(resolve, 500));
         
         // セッション詳細ページにリダイレクト
         if (response && response.sessionId) {
@@ -111,10 +168,79 @@ export function AudioUploadDropzone() {
       alert('アップロードに失敗しました');
     } finally {
       setUploading(false);
+      setProcessingStage(null);
     }
   };
 
   const demoMode = isDemoMode();
+
+  // 処理中のオーバーレイ表示
+  if (processingStage) {
+    const progress = stageProgress[processingStage];
+    const label = stageLabels[processingStage];
+    
+    return (
+      <GlassCard>
+        <div className="p-12">
+          <div className="max-w-md mx-auto space-y-8">
+            {/* アニメーションアイコン */}
+            <div className="flex justify-center">
+              <div className="relative">
+                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center animate-pulse">
+                  <svg className="w-12 h-12 text-white animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </div>
+                <div className="absolute inset-0 rounded-full bg-emerald-400 opacity-20 animate-ping"></div>
+              </div>
+            </div>
+
+            {/* ステージラベル */}
+            <div className="text-center">
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">分析中</h3>
+              <p className="text-lg text-gray-700">{label}</p>
+            </div>
+
+            {/* プログレスバー */}
+            <div className="space-y-3">
+              <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${progress}%` }}
+                ></div>
+              </div>
+              <p className="text-center text-sm text-gray-600">{progress}%</p>
+            </div>
+
+            {/* 処理ステップインジケーター */}
+            <div className="flex justify-between items-center px-4">
+              {(['uploading', 'transcribing', 'analyzing-sentiment', 'generating-summary', 'completing'] as const).map((stage, idx) => (
+                <div key={stage} className="flex flex-col items-center gap-2">
+                  <div className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    stageProgress[processingStage] >= stageProgress[stage]
+                      ? 'bg-emerald-500 scale-125'
+                      : 'bg-gray-300'
+                  }`}></div>
+                  {idx < 4 && (
+                    <div className={`w-12 h-0.5 transition-all duration-300 ${
+                      stageProgress[processingStage] > stageProgress[stage]
+                        ? 'bg-emerald-500'
+                        : 'bg-gray-300'
+                    }`}></div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* メッセージ */}
+            <div className="text-center text-sm text-gray-500 animate-pulse">
+              この処理には数秒かかる場合があります
+            </div>
+          </div>
+        </div>
+      </GlassCard>
+    );
+  }
 
   return (
     <GlassCard>
